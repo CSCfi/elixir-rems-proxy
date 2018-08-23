@@ -28,7 +28,7 @@ async def entitlements(request):
         elixir-id
     """
     try:
-        api_key = request.headers['x-rems-api-key']
+        api_key = request.headers['api-key']
         try:
             user_id = request.headers['elixir-id']
             async with aiohttp.ClientSession() as session:
@@ -36,7 +36,7 @@ async def entitlements(request):
                            'x-rems-api-key': api_key,
                            'x-rems-user-id': user_id}
                 LOG.info('Send request to REMS with headers: ' + str(headers))
-                async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:5000/api/entitlements'),
+                async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:3000/api/entitlements'),
                                        ssl=os.environ.get('HTTPS_ONLY', False),
                                        headers=headers) as response:
                     return web.Response(text=await response.text())
