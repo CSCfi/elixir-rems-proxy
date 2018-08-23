@@ -2,6 +2,10 @@
 
 This repository contains a proxy web server for calling a mock REMS API. The Mock API can also be substituted with an actual REMS API.
 
+![image](https://github.com/CSCfi/elixir-rems-proxy/blob/master/other/elixir-rems-proxy-2.png)
+
+Fig. 1: Proxy service overview.
+
 #### APIs
 * [proxy](https://github.com/CSCfi/elixir-rems-proxy/tree/master/proxy) - proxy service that serves as a bridge between ELIXIR AAI and REMS API.
 * [mock rems](https://github.com/CSCfi/elixir-rems-proxy/tree/master/mock) - web server that mocks REMS API for testing and demonstrating purposes.
@@ -24,6 +28,7 @@ What happens here?
 * `proxy.py` forwards the request to `mockrems.py` served at `localhost:3000/api/entitlements`.
 * `mockrems.py` responds to the request originated from `proxy.py`.
 * `proxy.py` delivers the response from `mockrems.py` back to the user.
+* [Video demo](https://puu.sh/BiSMr/ffeb09a9de.mp4) of the workflow in Figure 1.
 
 ### Run the proxy against the actual REMS API
 Install and set up a local REMS instance to be called upon from the proxy service.
@@ -31,6 +36,7 @@ Install and set up a local REMS instance to be called upon from the proxy servic
 * Upon finishing the backend installation, populate the database with test data using `lein run test-data`.
 * The REMS API is served by default at `localhost:3000`.
 * Make sure the `REMS_API_URL` is set to `localhost:3000/api/entitlements`, it should default to this value if no value is given.
+* [Video demo](https://puu.sh/BiVts/23c789131d.mp4) of this case.
 
 Next you may call the Proxy, which delivers the request to the REMS API.
 
