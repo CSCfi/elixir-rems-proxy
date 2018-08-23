@@ -50,7 +50,7 @@ def api_endpoint():
 def main():
     """Run mock app."""
     app.run(host=os.environ.get('APP_HOST', 'localhost'),
-            port=os.environ.get('APP_PORT', 5000),
+            port=os.environ.get('APP_PORT', 3000),
             debug=os.environ.get('APP_DEBUG', True))
 
 

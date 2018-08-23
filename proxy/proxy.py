@@ -35,7 +35,7 @@ async def entitlements(request):
                            'x-rems-api-key': api_key,
                            'x-rems-user-id': user_id}
                 LOG.info('Send request to REMS with headers: ' + str(headers))
-                async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:5000/api/entitlements'),
+                async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:3000/api/entitlements'),
                                        ssl=os.environ.get('HTTPS_ONLY', False),
                                        headers=headers) as response:
                     return web.Response(text=await response.text())
@@ -52,7 +52,7 @@ def main():
     app.router.add_get('/entitlements', entitlements)
     web.run_app(app,
                 host=os.environ.get('APP_HOST', 'localhost'),
-                port=os.environ.get('APP_PORT', 5001))
+                port=os.environ.get('APP_PORT', 5000))
 
 
 if __name__ == '__main__':
