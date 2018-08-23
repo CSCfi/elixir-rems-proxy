@@ -6,7 +6,6 @@ import logging
 
 from aiohttp import web
 
-
 # Logging
 FORMAT = '[%(asctime)s][%(name)s][%(process)d %(processName)s][%(levelname)-8s] (L:%(lineno)s) %(funcName)s: %(message)s'
 logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
@@ -15,17 +14,17 @@ LOG.setLevel(logging.INFO)
 
 
 async def hello(request):
-    """Health check"""
+    """Health check."""
     return web.HTTPOk()
 
 
 async def entitlements(request):
     """
-    Request endpoint
-    
+    Request endpoint.
+
     Required headers:
-        x-rems-api-key
-        elixir-id
+        api-key (translates to x-rems-api-key)
+        elixir-id (translates to x-rems-user-id)
     """
     try:
         api_key = request.headers['api-key']
@@ -36,7 +35,7 @@ async def entitlements(request):
                            'x-rems-api-key': api_key,
                            'x-rems-user-id': user_id}
                 LOG.info('Send request to REMS with headers: ' + str(headers))
-                async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:3000/api/entitlements'),
+                async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:5000/api/entitlements'),
                                        ssl=os.environ.get('HTTPS_ONLY', False),
                                        headers=headers) as response:
                     return web.Response(text=await response.text())
@@ -47,7 +46,7 @@ async def entitlements(request):
 
 
 def main():
-    """Run proxy"""
+    """Run proxy."""
     app = web.Application()
     app.router.add_get('/', hello)
     app.router.add_get('/entitlements', entitlements)
