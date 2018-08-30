@@ -32,7 +32,7 @@ What happens here?
 * `proxy.py` forwards the request to `mockrems.py` served at `localhost:3000/api/entitlements`;
 * `mockrems.py` responds to the request originated from `proxy.py`;
 * `proxy.py` delivers the response from `mockrems.py` back to the user;
-* [Video demo](https://puu.sh/BiSMr/ffeb09a9de.mp4) of the workflow in Figure 1.
+* [Video demo](https://puu.sh/BiSMr/ffeb09a9de.mp4) of the workflow in Figure 1  (if the video doesn't show, see it from [other/mockrems.mp4](other/mockrems.mp4).
 
 ### Run the proxy against the actual REMS API
 
@@ -41,7 +41,7 @@ Install and set up a local REMS instance to be called upon from the proxy servic
 * Upon finishing the backend installation, populate the database with test data using `lein run test-data`;
 * The REMS API is served by default at `localhost:3000`;
 * Make sure the `REMS_API_URL` environment variable is set to `localhost:3000/api/entitlements`, it should default to this value if no value is given;
-* [Video demo](https://puu.sh/BiVts/23c789131d.mp4) of this case.
+* [Video demo](https://puu.sh/BiVts/23c789131d.mp4) of this case (if the video doesn't show, see it from [other/actualrems.mp4](other/actualrems.mp4).
 
 Next you may call the Proxy, which delivers the request to the REMS API.
 
