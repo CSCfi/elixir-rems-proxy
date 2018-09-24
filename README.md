@@ -28,10 +28,10 @@ Request data from the REMS API via the Proxy.
 curl -H "api-key: abc123" -H "elixir-id: userid@elixir-europe.org" localhost:5000/entitlements
 ```
 What happens here?
-* A request is sent to `proxy.py` served at `localhost:5000/entitlements`;
-* `proxy.py` forwards the request to `mockrems.py` served at `localhost:3000/api/entitlements`;
-* `mockrems.py` responds to the request originated from `proxy.py`;
-* `proxy.py` delivers the response from `mockrems.py` back to the user;
+* A request is sent to `proxy/app.py` served at `localhost:5000/entitlements`;
+* `proxy/app.py` forwards the request to `mock/app.py` served at `localhost:3000/api/entitlements`;
+* `mock/app.py` responds to the request originated from `proxy/app.py`;
+* `proxy/app.py` delivers the response from `mock/app.py` back to the user;
 * [Video demo](https://puu.sh/BiSMr/ffeb09a9de.mp4) of the workflow in Figure 1  (if the video doesn't show, see it from [other/mockrems.mp4](other/mockrems.mp4).
 
 ### Run the proxy against the actual REMS API
@@ -58,16 +58,16 @@ curl -H "api-key: 42" -H "elixir-id: developer" localhost:5000/entitlements?user
 ^Using the test data `api-key: 42`, `elixir-id: developer`, `?user=alice` that were generated with `lein run test-data`.
 
 ### Environment Variables
-The following environment variables are used to configure `proxy.py`.
+The following environment variables are used to configure `proxy/app.py`.
 
 | ENV | Default | Description |
 | --- | --- | --- |
-| `REMS_API_URL` | `http://localhost:3000/api/entitlements` | REMS API endpoint for entitlements. Same for `mockrems.py` and actual REMS API |
+| `REMS_API_URL` | `http://localhost:3000/api/entitlements` | REMS API endpoint for entitlements. |
 | `HTTPS_ONLY` | `False` | If set to `True` will only allow requests to `https://` is `False` for testing. |
 | `APP_HOST` | `localhost` | Hostname for Proxy service. |
 | `APP_PORT` | `5000` | Port for Proxy service. |
 
-The following environment variables are used to configure `mockrems.py`.
+The following environment variables are used to configure `mock/app.py`.
 
 | ENV | Default | Description |
 | --- | --- | --- |
