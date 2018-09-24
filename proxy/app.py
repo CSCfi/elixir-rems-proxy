@@ -15,6 +15,7 @@ LOG.setLevel(logging.INFO)
 
 async def hello(request):
     """Health check."""
+    LOG.info('Health check')
     return web.HTTPOk()
 
 
@@ -34,14 +35,18 @@ async def entitlements(request):
                 headers = {'User-Agent': 'ELIXIR AAI Entitlements Proxy',
                            'x-rems-api-key': api_key,
                            'x-rems-user-id': user_id}
-                LOG.info('Send request to REMS with headers: ' + str(headers))
+                LOG.info('Send request to REMS')
                 async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:3000/api/entitlements'),
                                        ssl=os.environ.get('HTTPS_ONLY', False),
                                        headers=headers) as response:
-                    return web.Response(text=await response.text())
+                    resp = await response
+                    LOG.info('REMS response status: ' + str(resp.status()))
+                    return web.Response(text=resp.text())
         except KeyError as e:
+            LOG.error('ERROR: ' + str(e))
             return web.HTTPBadRequest()
     except KeyError as e:
+        LOG.error('ERROR: ' + str(e))
         return web.HTTPBadRequest()
 
 
@@ -50,6 +55,7 @@ def main():
     app = web.Application()
     app.router.add_get('/', hello)
     app.router.add_get('/entitlements', entitlements)
+    LOG.info('Starting web app...')
     web.run_app(app,
                 host=os.environ.get('APP_HOST', 'localhost'),
                 port=os.environ.get('APP_PORT', 5000))
