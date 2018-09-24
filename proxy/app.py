@@ -39,7 +39,7 @@ async def entitlements(request):
                 async with session.get(os.environ.get('REMS_API_URL', 'http://localhost:3000/api/entitlements'),
                                        ssl=os.environ.get('HTTPS_ONLY', False),
                                        headers=headers) as response:
-                    LOG.info('REMS response status: ' + str(await response.status()))
+                    LOG.info('REMS response status: ' + str(response.status))
                     return web.Response(text=await response.text())
         except KeyError as e:
             LOG.error('ERROR: ' + str(e))
