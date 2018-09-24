@@ -17,11 +17,11 @@ Note: **Requires Python 3.6+**
 
 Start the proxy server.
 ```
-python3 proxy/proxy.py
+python3 proxy/app.py
 ```
 Start the mock REMS API.
 ```
-python3 mock/mockrems.py
+python3 mock/app.py
 ```
 Request data from the REMS API via the Proxy.
 ```
