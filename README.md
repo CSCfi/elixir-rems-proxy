@@ -11,6 +11,18 @@ Fig. 1: Proxy service overview.
 * [proxy](proxy) - proxy service that serves as a bridge between ELIXIR AAI and REMS API.
 * [mock rems](mock) - web server that mocks REMS API for testing and demonstrating purposes.
 
+### Run tests
+
+Run simple pytest test case.
+```
+pytest
+```
+
+Run tox automation.
+```
+tox
+```
+
 ### Run apps
 
 Note: **Requires Python 3.6+**
