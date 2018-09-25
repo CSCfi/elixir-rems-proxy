@@ -12,13 +12,18 @@ logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
 
+# Gather API endpoints
+routes = web.RouteTableDef()
 
-async def hello(request):
+
+@routes.get('/health')
+async def health(request):
     """Health check."""
     LOG.info('Health check')
     return web.HTTPOk()
 
 
+@routes.get('/entitlements')
 async def entitlements(request):
     """
     Request endpoint.
@@ -49,16 +54,23 @@ async def entitlements(request):
         return web.HTTPBadRequest()
 
 
+def init():
+    """Initialise the server."""
+    LOG.info('Initialising server...')
+    server = web.Application()
+    server.router.add_routes(routes)
+    LOG.info('Server initialised!')
+    return server
+
+
 def main():
     """Run proxy."""
-    app = web.Application()
-    app.router.add_get('/', hello)
-    app.router.add_get('/entitlements', entitlements)
     LOG.info('Starting web app...')
-    web.run_app(app,
+    web.run_app(init(),
                 host=os.environ.get('APP_HOST', 'localhost'),
                 port=os.environ.get('APP_PORT', 5000))
 
 
 if __name__ == '__main__':
+    LOG.info('Start procedures for running server...')
     main()
