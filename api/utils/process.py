@@ -1,8 +1,8 @@
 """Process Requests."""
 
 from ..utils.logging import LOG
-from ..utils.db_actions import user_exists, create_user
-from ..utils.db_actions import get_dataset_permissions, create_dataset_permissions
+from ..utils.db_actions import user_exists, create_user, delete_user
+from ..utils.db_actions import get_dataset_permissions, create_dataset_permissions, remove_dataset_permissions
 
 async def create_response_body(db_response):
     """Construct a dictionary for JSON response body."""
@@ -26,7 +26,7 @@ async def process_post_request(request, db_pool):
     db_response = await user_exists(request_body['user_identifier'], db_pool)
     if db_response:
         # user_identifier exists, new user can't be created
-        return 'user_identifier is taken', None
+        return 'Username is taken', None
     else:
         # Create new user and dataset permissions
         user_created = await create_user(request_body['user_identifier'], db_pool)
@@ -72,7 +72,22 @@ async def process_patch_request():
     pass
 
 
-async def process_delete_request():
-    """Delete user and dataset permissions."""
-    LOG.debug('Process DELETE request.')
-    pass
+async def process_delete_request(user, db_pool):
+    """Fetch user dataset permissions."""
+    LOG.debug('Process GET request.')
+    db_response = await user_exists(user, db_pool)
+    if db_response:
+        # Check if user has permissions to be removed
+        permissions = await get_dataset_permissions(user, db_pool)
+        if permissions:
+            # Try to remove permissions before removing user
+            await remove_dataset_permissions(user, db_pool)
+        # Finally remove the user
+        user_removed = await delete_user(user, db_pool)
+        if user_removed:
+            return None, True
+        else:
+            return 'Database error when attempting to remove user', False
+    else:
+        # User doesn't exist
+        return 'User not found', False

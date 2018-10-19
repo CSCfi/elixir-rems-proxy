@@ -71,10 +71,11 @@ async def get_dataset_index(ds, db_pool):
 
 async def create_dataset_permissions(user, dataset_group, db_pool):
     """Create dataset permissions."""
+    LOG.debug('Create dataset permissions.')
     LOG.debug(dataset_group)
     errors = []
-    # Take one connection from the active database connection pool
     try:
+        # Take one connection from the active database connection pool
         async with db_pool.acquire() as connection:
             # Start a new session with the connection
             async with connection.transaction():
@@ -92,3 +93,31 @@ async def create_dataset_permissions(user, dataset_group, db_pool):
         return errors
     except Exception as e:
         LOG.debug(f'An error occurred while attempting to create permissions -> {e}')
+
+
+async def remove_dataset_permissions(user, db_pool):
+    """Remove dataset permissions."""
+    LOG.debug('Remove dataset permissions.')
+    try:
+        # Take one connection from the active database connection pool
+        async with db_pool.acquire() as connection:
+            # Start a new session with the connection
+            async with connection.transaction():
+                await connection.execute(f"""DELETE FROM entitlement WHERE userid='{user}'""")
+    except Exception as e:
+        LOG.debug(f'An error occurred while attempting to remove permissions -> {e}')
+
+
+async def delete_user(user, db_pool):
+    """Remove user."""
+    LOG.debug('Delete user.')
+    try:
+        # Take one connection from the active database connection pool
+        async with db_pool.acquire() as connection:
+            # Start a new session with the connection
+            async with connection.transaction():
+                await connection.execute(f"""DELETE FROM users WHERE userid='{user}'""")
+        return True
+    except Exception as e:
+        LOG.debug(f'An error occurred while attempting to delete user -> {e}')
+        return False

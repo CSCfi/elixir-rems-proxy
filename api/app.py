@@ -35,7 +35,7 @@ async def user_post(request):
         if not exception:
             return web.HTTPOk(text='Successful operation')
         else:
-            return web.HTTPPartialContent(text=f'Some operations failed({exception}), check "GET /user" endpoint for permissions')
+            return web.HTTPCreated(text=f'Following datasets are missing from REMS ({exception}), check "GET /user" endpoint for added permissions')
     else:
         return web.HTTPConflict(text=exception)
 
@@ -52,23 +52,24 @@ async def user_get(request):
     user_identifier = None  # username in REMS
     db_pool = request.app['pool']
 
-    try:
-        # Mandatory path variable, retrieved from path /user/{user}
-        user_identifier = request.match_info['user']
-        # Optional query parameter, retrieved from /user/{user}?user_affiliation={organisation}
-        # user_affiliation = request.query['user_affiliation']  # NOT IN USE
-    except KeyError as key_error:
-        LOG.debug(f'KeyError at optional key {key_error}, ignore and pass.')
-        pass
+    # try:
+    #     # Mandatory path variable, retrieved from path /user/{user}
+        
+    #     # Optional query parameter, retrieved from /user/{user}?user_affiliation={organisation}
+    #     # user_affiliation = request.query['user_affiliation']  # NOT IN USE
+    # except KeyError as key_error:
+    #     LOG.debug(f'KeyError at optional key {key_error}, ignore and pass.')
+    #     pass
 
-    if user_identifier:
+    if 'user' in request.match_info:
+        user_identifier = request.match_info['user']
         exception, processed_request = await process_get_request(user_identifier, db_pool)
         if processed_request:
             return web.json_response(processed_request)
         else:
             return web.HTTPNotFound(text=exception)
     else:
-        return web.HTTPBadRequest(text='Missing mandatory path variable /user/<username>')
+        return web.HTTPBadRequest(text='Invalid username supplied')
 
 
 @routes.patch('/user')
@@ -81,14 +82,27 @@ async def user_patch(request):
     return web.json_response('patch')
 
 
-@routes.delete('/user')
+@routes.delete('/user/{user}')
 async def user_delete(request):
     """DELETE request to the /user endpoint.
 
     Delete user."""
     LOG.debug('DELETE Request received.')
-    # TO DO: This
-    return web.json_response('delete')
+    user_identifier = None  # username in REMS
+    db_pool = request.app['pool']
+
+    if 'user' in request.match_info:
+        user_identifier = request.match_info['user']
+        exception, processed_request = await process_delete_request(user_identifier, db_pool)
+        if processed_request:
+            if not exception:
+                return web.HTTPOk(text='User was deleted')
+            else:
+                return web.HTTPInternalServerError(text=exception)
+        else:
+            return web.HTTPNotFound(text='User not found')
+    else:
+        return web.HTTPBadRequest(text='Invalid username supplied')
 
 
 async def init_db(app):
