@@ -34,10 +34,18 @@ async def process_post_request(request, db_pool):
         if user_created:
             # Parse datasets out of request_body
             # ELIXIR API Specification has a typo in it, but this iterator satisfies it.
-            # Come back and fix this dictionary-array-mess once the specification has been corrected
-            dataset_group = [[p['affiliation'], p['datasets']] for p in body['datasets'][0]['permissions']]
-            permissions_created = await create_dataset_permissions(dataset_group, db_pool)
-            LOG.debug(permissions_created)
+            # Come back and fix this once the specification has been corrected
+            # dataset_group = [[p['affiliation'], p['datasets']] for p in body['permissions']]  # Correct form
+            dataset_group = [[p['affiliation'], p['datasets']] for p in request_body['datasets'][0]['permissions']]
+            permissions_errors = await create_dataset_permissions(request_body['user_identifier'], dataset_group, db_pool)
+            LOG.debug(f'Error list from creating permissions: {permissions_errors}. Should be empty!')
+            if permissions_errors:
+                # If there are errors, return proper message
+                return permissions_errors, True
+            else:
+                # All inserts were processed successfully
+                return None, True
+
 
 
 async def process_get_request(user, db_pool):

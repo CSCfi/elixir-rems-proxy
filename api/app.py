@@ -32,7 +32,10 @@ async def user_post(request):
     exception, processed_request = await process_post_request(request, db_pool)
 
     if processed_request:
-        return web.HTTPOk(text='Successful operation')
+        if not exception:
+            return web.HTTPOk(text='Successful operation')
+        else:
+            return web.HTTPPartialContent(text=f'Some operations failed({exception}), check "GET /user" endpoint for permissions')
     else:
         return web.HTTPConflict(text=exception)
 
