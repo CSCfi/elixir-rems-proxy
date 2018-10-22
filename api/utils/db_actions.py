@@ -6,24 +6,32 @@ from ..utils.logging import LOG
 async def user_exists(user, connection):
     """Check if user exists."""
     LOG.debug(f'Check if user {user} exists')
-    query = f"""SELECT userid FROM users WHERE userid='{user}';"""
-    statement = await connection.prepare(query)
-    db_response = await statement.fetch()
-    LOG.debug(f'Response: {db_response}')
-    return db_response
+    try:
+        query = f"""SELECT userid FROM users WHERE userid='{user}';"""
+        statement = await connection.prepare(query)
+        db_response = await statement.fetch()
+        LOG.debug(f'Response: {db_response}')
+        return db_response
+    except Exception as e:
+        LOG.debug(f'An error occurred while attempting to fetch user -> {e}')
+        return None
 
 
 async def get_dataset_permissions(user, connection):
     """Return dataset permissions for given user."""
     LOG.debug(f'Query database for {user}\'s dataset permissions')
-    query = f"""SELECT organization, a.resid, a.start, a.endt
-                FROM resource a, entitlement b
-                WHERE a.id=b.resid
-                AND b.userid='{user}';"""
-    statement = await connection.prepare(query)
-    db_response = await statement.fetch()
-    LOG.debug(f'Response: {db_response}')
-    return db_response
+    try:
+        query = f"""SELECT organization, a.resid, a.start, a.endt
+                    FROM resource a, entitlement b
+                    WHERE a.id=b.resid
+                    AND b.userid='{user}';"""
+        statement = await connection.prepare(query)
+        db_response = await statement.fetch()
+        LOG.debug(f'Response: {db_response}')
+        return db_response
+    except Exception as e:
+        LOG.debug(f'An error occurred while attempting to fetch permissions -> {e}')
+        return None
 
 
 async def create_user(user, connection):
@@ -44,15 +52,19 @@ async def get_dataset_index(ds, connection):
 
     Returns dataset resource id for later use."""
     LOG.debug(f'Check if dataset {ds} exists')
-    query = f"""SELECT id FROM resource WHERE organization='{ds[0]}' AND resid='{ds[1]}';"""
-    statement = await connection.prepare(query)
-    db_response = await statement.fetch()
-    if db_response:
-        LOG.debug(f'Response: {db_response}')
-        return dict(db_response[0])['id']  # Pass id from record
-    else:
-        # Could not find dataset belonging to this organisation
-        return False
+    try:
+        query = f"""SELECT id FROM resource WHERE organization='{ds[0]}' AND resid='{ds[1]}';"""
+        statement = await connection.prepare(query)
+        db_response = await statement.fetch()
+        if db_response:
+            LOG.debug(f'Response: {db_response}')
+            return dict(db_response[0])['id']  # Pass id from record
+        else:
+            # Could not find dataset belonging to this organisation
+            return False
+    except Exception as e:
+        LOG.debug(f'An error occurred while attempting to fetch dataset index -> {e}')
+        return None
 
 
 async def create_dataset_permissions(user, dataset_group, connection):
@@ -76,6 +88,7 @@ async def create_dataset_permissions(user, dataset_group, connection):
             return errors
     except Exception as e:
         LOG.debug(f'An error occurred while attempting to create permissions -> {e}')
+        return None
 
 
 async def remove_dataset_permissions(user, connection):
@@ -83,8 +96,10 @@ async def remove_dataset_permissions(user, connection):
     LOG.debug('Remove dataset permissions.')
     try:
         await connection.execute(f"""DELETE FROM entitlement WHERE userid='{user}'""")
+        return True
     except Exception as e:
         LOG.debug(f'An error occurred while attempting to remove permissions -> {e}')
+        return None
 
 
 async def delete_user(user, connection):
@@ -95,4 +110,4 @@ async def delete_user(user, connection):
         return True
     except Exception as e:
         LOG.debug(f'An error occurred while attempting to delete user -> {e}')
-        return False
+        return None
