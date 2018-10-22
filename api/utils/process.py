@@ -26,7 +26,7 @@ async def process_post_request(request, db_pool):
     db_response = await user_exists(request_body['user_identifier'], db_pool)
     if db_response:
         # user_identifier exists, new user can't be created
-        return 'Username is taken', None
+        return 'Username is taken', False
     else:
         # Create new user and dataset permissions
         user_created = await create_user(request_body['user_identifier'], db_pool)
@@ -60,16 +60,49 @@ async def process_get_request(user, db_pool):
             return None, permissions_response
         else:
             # User has no dataset permissions
-            return 'Permissions for this user not found', None
+            return 'Permissions for this user not found', False
     else:
         # User doesn't exist
-        return 'User not found', None
+        return 'User not found', False
 
 
-async def process_patch_request():
+async def process_patch_request(request, db_pool):
     """Update user's dataset permissions."""
     LOG.debug('Process PATCH request.')
-    pass
+    request_body = await request.json()
+    db_response = await user_exists(request_body['user_identifier'], db_pool)
+    LOG.debug('check if user exists')
+    if db_response:
+        # user_identifier exists, continue with operations
+        # Check if user has permissions to be removed
+        permissions = await get_dataset_permissions(request_body['user_identifier'], db_pool)
+        LOG.debug('check permissions')
+        if permissions:
+            # Try to remove permissions before adding new permissions
+            await remove_dataset_permissions(request_body['user_identifier'], db_pool)
+            LOG.debug('remove permissions')
+        # Parse datasets out of request_body
+        # ELIXIR API Specification has a typo in it, but this iterator satisfies it.
+        # Come back and fix this once the specification has been corrected
+        # dataset_group = [[p['affiliation'], p['datasets']] for p in body['permissions']]  # Correct form
+        dataset_group = [[p['affiliation'], p['datasets']] for p in request_body['datasets'][0]['permissions']]
+        LOG.debug('parse body')
+        if dataset_group:
+            # If any datasets were listed, add permissions for them
+            permissions_errors = await create_dataset_permissions(request_body['user_identifier'], dataset_group, db_pool)
+            LOG.debug('create permissions')
+            LOG.debug(f'Error list from creating permissions: {permissions_errors}. Should be empty!')
+            if permissions_errors:
+                # If there are errors, return proper message
+                return permissions_errors, True
+            else:
+                # All inserts were processed successfully
+                return None, True
+        else:
+            # Body contained no datasets, end operations here
+            return None, True        
+    else:
+        return 'User not found', False
 
 
 async def process_delete_request(user, db_pool):

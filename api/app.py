@@ -39,8 +39,6 @@ async def user_post(request):
     else:
         return web.HTTPConflict(text=exception)
 
-    return web.json_response('post')
-
 
 @routes.get('/user/')
 @routes.get('/user/{user}')
@@ -53,8 +51,6 @@ async def user_get(request):
     db_pool = request.app['pool']
 
     # try:
-    #     # Mandatory path variable, retrieved from path /user/{user}
-        
     #     # Optional query parameter, retrieved from /user/{user}?user_affiliation={organisation}
     #     # user_affiliation = request.query['user_affiliation']  # NOT IN USE
     # except KeyError as key_error:
@@ -72,14 +68,24 @@ async def user_get(request):
         return web.HTTPBadRequest(text='Invalid username supplied')
 
 
-@routes.patch('/user')
+@routes.patch('/user/{user}')
 async def user_patch(request):
     """PATCH request to the /user endpoint.
 
     Update dataset permissions for given user."""
     LOG.debug('PATCH Request received.')
-    # TO DO: This
-    return web.json_response('patch')
+    db_pool = request.app['pool']
+
+    ### PUT USER INTO PROCESS
+    exception, processed_request = await process_patch_request(request, db_pool)
+
+    if processed_request:
+        if not exception:
+            return web.HTTPOk(text='Successful operation')
+        else:
+            return web.HTTPCreated(text=f'Following datasets are missing from REMS ({exception}), check "GET /user" endpoint for permissions')
+    else:
+        return web.HTTPNotFound(text='User not found')
 
 
 @routes.delete('/user/{user}')
