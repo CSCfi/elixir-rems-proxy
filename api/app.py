@@ -76,16 +76,18 @@ async def user_patch(request):
     LOG.debug('PATCH Request received.')
     db_pool = request.app['pool']
 
-    ### PUT USER INTO PROCESS
-    exception, processed_request = await process_patch_request(request, db_pool)
-
-    if processed_request:
-        if not exception:
-            return web.HTTPOk(text='Successful operation')
+    if 'user' in request.match_info:
+        user_identifier = request.match_info['user']
+        exception, processed_request = await process_patch_request(user_identifier, request, db_pool)
+        if processed_request:
+            if not exception:
+                return web.HTTPOk(text='Successful operation')
+            else:
+                return web.HTTPCreated(text=f'Following datasets are missing from REMS ({exception}), check "GET /user" endpoint for permissions')
         else:
-            return web.HTTPCreated(text=f'Following datasets are missing from REMS ({exception}), check "GET /user" endpoint for permissions')
+            return web.HTTPNotFound(text='User not found')
     else:
-        return web.HTTPNotFound(text='User not found')
+        return web.HTTPBadRequest(text='Invalid username supplied')
 
 
 @routes.delete('/user/{user}')
