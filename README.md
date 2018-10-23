@@ -1,84 +1,93 @@
-## ELIXIR AAI to REMS Proxy
+## ELIXIR API for REMS
+This API is built according to the [ELIXIR Permissions API Specification 1.2](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2), which provides ELIXIR AAI with a custom API that is directly connected to a given REMS database.
 
-
-This repository contains a proxy web server for calling a mock REMS API. The Mock API can also be substituted with an actual REMS API.
-
-![image](other/elixir-rems-proxy-2.png)
-
-Fig. 1: Proxy service overview.
-
-#### Contents
-* [proxy](proxy) - proxy service that serves as a bridge between ELIXIR AAI and REMS API.
-* [mock rems](mock) - web server that mocks REMS API for testing and demonstrating purposes.
-
-### Run tests
-
-Run simple pytest test case.
+### Quickstart
+#### Prerequisites
+Set up a REMS database with test data.
 ```
-pytest
+git clone https://github.com/CSCfi/rems/
+cd rems
+./dev_db.sh
+lein run test-data
 ```
+In case of issues with setting up the REMS database, consult their [GitHub page](https://github.com/CSCfi/rems/).
 
-Run tox automation.
+#### Run API
+Download repository, install modules, run app.
 ```
-tox
+git clone https://github.com/CSCfi/elixir-rems-proxy/
+cd elixir-rems-proxy
+pip install -r requirements.txt
+python3 -m api.app
 ```
 
-### Run apps
+### Using the API
+For more technical details, consult the [API Specification](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2)
 
-Note: **Requires Python 3.6+**
-
-Start the proxy server.
+#### POST /user
+`POST` method at `/user` endpoint is used to create a new user with dataset permissions.
 ```
-python3 proxy/app.py
+curl -X POST \
+  http://localhost:8080/user \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user_identifier": "test_user",
+  "affiliation": "",
+  "datasets": [
+    {
+      "permissions": [
+        {
+          "affiliation": "example-org",
+          "source_signature": "",
+          "url_prefix": "",
+          "datasets": [
+            "urn:example-dataset-1",
+            "urn:example-dataset-2"
+          ]
+        }
+      ]
+    }
+  ]
+}'
 ```
-Start the mock REMS API.
+
+#### GET /user/username
+`GET` method at `/user` endpoint is used to fetch dataset permissions for user.
 ```
-python3 mock/app.py
+curl -X GET http://localhost:8080/user/test_user
 ```
-Request data from the REMS API via the Proxy.
+
+#### PATCH /user/username
+`PATCH` method at `/user` endpoint is used to update dataset permissions for user.
 ```
-curl -H "api-key: abc123" -H "elixir-id: userid@elixir-europe.org" localhost:5000/entitlements
+curl -X PATCH \
+  http://localhost:8080/user/test_user \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user_identifier": "",
+  "affiliation": "",
+  "datasets": [
+    {
+      "permissions": [
+        {
+          "affiliation": "example-org",
+          "source_signature": "",
+          "url_prefix": "",
+          "datasets": [
+            "urn:example-dataset-3"
+          ]
+        }
+      ]
+    }
+  ]
+}'
 ```
-What happens here?
-* A request is sent to `proxy/app.py` served at `localhost:5000/entitlements`;
-* `proxy/app.py` forwards the request to `mock/app.py` served at `localhost:3000/api/entitlements`;
-* `mock/app.py` responds to the request originated from `proxy/app.py`;
-* `proxy/app.py` delivers the response from `mock/app.py` back to the user;
-* [Video demo](https://puu.sh/BiSMr/ffeb09a9de.mp4) of the workflow in Figure 1  (if the video doesn't show, see it from [other/mockrems.mp4](other/mockrems.mp4)).
 
-### Run the proxy against the actual REMS API
-
-Install and set up a local REMS instance to be called upon from the proxy service;
-* Follow the REMS installation instructions [here](https://github.com/CSCfi/rems);
-* Upon finishing the backend installation, populate the database with test data using `lein run test-data`;
-* The REMS API is served by default at `localhost:3000`;
-* Make sure the `REMS_API_URL` environment variable is set to `localhost:3000/api/entitlements`, it should default to this value if no value is given;
-* [Video demo](https://puu.sh/BiVts/23c789131d.mp4) of this case (if the video doesn't show, see it from [other/actualrems.mp4](other/actualrems.mp4)).
-
-Next you may call the Proxy, which delivers the request to the REMS API.
-
+#### DELETE /user/username
+`DELETE` method at `/user` endpoint is used to delete user along with dataset permissions.
 ```
-curl -H "api-key: 42" -H "elixir-id: alice" localhost:5000/entitlements
+curl -X DELETE http://localhost:8080/user/test_user
 ```
-^Using the test data `api-key: 42` and `elixir-id: alice` that were generated with `lein run test-data`.
 
-
-### Environment Variables
-The following environment variables are used to configure `proxy/app.py`.
-
-| ENV | Default | Description |
-| --- | --- | --- |
-| `REMS_API_URL` | `http://localhost:3000/api/entitlements` | REMS API endpoint for entitlements. |
-| `HTTPS_ONLY` | `False` | If set to `True` will only allow requests to `https://` is `False` for testing. |
-| `APP_HOST` | `localhost` | Hostname for Proxy service. |
-| `APP_PORT` | `5000` | Port for Proxy service. |
-
-The following environment variables are used to configure `mock/app.py`.
-
-| ENV | Default | Description |
-| --- | --- | --- |
-| `REMS_API_KEY` | `abc123` | Required API key. Invalid key in headers results in HTTP 401. |
-| `REMS_USER_ID` | `userid@elixir-europe.org` | Required user ID. Invalid user ID in headers results in HTTP 404. |
-| `APP_HOST` | `localhost` | Hostname for Proxy service. |
-| `APP_PORT` | `3000` | Port for Proxy service. |
-| `APP_DEBUG` | `True` | Enables debug logs in terminal. |
+### Other Business
+The [Permissions API Specification](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2) contains some typos. A [suggestions](suggestions.md) document has been drafted to correct those issues. Expect changes to be made to the specification in the near future, along with changes to the API app.
