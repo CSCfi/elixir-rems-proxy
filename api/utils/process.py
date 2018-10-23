@@ -1,5 +1,7 @@
 """Process Requests."""
 
+from aiohttp import web
+
 from ..utils.logging import LOG
 from ..utils.db_actions import user_exists, create_user, delete_user
 from ..utils.db_actions import get_dataset_permissions, create_dataset_permissions, remove_dataset_permissions
@@ -32,7 +34,7 @@ async def process_post_request(request, db_pool):
         user_found = await user_exists(request_body['user_identifier'], connection)
         if user_found:
             # user_identifier exists, new user can't be created
-            return 'Username is taken', False
+            raise web.HTTPConflict(text='Username taken')
         else:
             # Create new user and dataset permissions
             user_created = await create_user(request_body['user_identifier'], connection)
@@ -43,14 +45,9 @@ async def process_post_request(request, db_pool):
                 # Come back and fix this once the specification has been corrected
                 # dataset_group = [[p['affiliation'], p['datasets']] for p in body['permissions']]  # Correct form
                 dataset_group = [[p['affiliation'], p['datasets']] for p in request_body['datasets'][0]['permissions']]
-                permissions_errors = await create_dataset_permissions(request_body['user_identifier'], dataset_group, connection)
-                LOG.debug(f'Error list from creating permissions: {permissions_errors}. Should be empty!')
-                if permissions_errors:
-                    # If there are errors, return proper message
-                    return permissions_errors, True
-                else:
-                    # All inserts were processed successfully
-                    return None, True
+                missing_datasets = await create_dataset_permissions(request_body['user_identifier'], dataset_group, connection)
+                LOG.debug(f'List of datasets that are missing from REMS: {missing_datasets}. If empty, all were found.')
+                return missing_datasets  # If this list is empty, it means the request was processed fully
 
 
 async def process_get_request(user, db_pool):
@@ -67,13 +64,13 @@ async def process_get_request(user, db_pool):
             if permissions:
                 # Return permitted datasets
                 permissions_response = await create_response_body(permissions)
-                return None, permissions_response
+                return permissions_response
             else:
                 # User has no dataset permissions
-                return 'Permissions for this user not found', False
+                raise web.HTTPNotFound(text='Permissions for this user not found')
         else:
             # User doesn't exist
-            return 'User not found', False
+            raise web.HTTPNotFound(text='User not found')
 
 
 async def process_patch_request(user, request, db_pool):
@@ -99,19 +96,14 @@ async def process_patch_request(user, request, db_pool):
             dataset_group = [[p['affiliation'], p['datasets']] for p in request_body['datasets'][0]['permissions']]
             if dataset_group:
                 # If any datasets were listed, add permissions for them
-                permissions_errors = await create_dataset_permissions(user, dataset_group, connection)
-                LOG.debug(f'Error list from creating permissions: {permissions_errors}. Should be empty!')
-                if permissions_errors:
-                    # If there are errors, return proper message
-                    return permissions_errors, True
-                else:
-                    # All inserts were processed successfully
-                    return None, True
+                missing_datasets = await create_dataset_permissions(user, dataset_group, connection)
+                LOG.debug(f'List of datasets that are missing from REMS: {missing_datasets}. If empty, all were found.')
+                return missing_datasets  # If this list is empty, it means the request was processed fully
             else:
                 # Body contained no datasets, end operations here (permissions removed, none added)
-                return None, True
+                return True
         else:
-            return 'User not found', False
+            raise web.HTTPNotFound(text='User not found')
 
 
 async def process_delete_request(user, db_pool):
@@ -130,9 +122,8 @@ async def process_delete_request(user, db_pool):
             # Finally remove the user
             user_removed = await delete_user(user, connection)
             if user_removed:
-                return None, True
+                return True
             else:
-                return 'Database error when attempting to remove user', False
+                raise web.HTTPInternalServerError(text='Database error when attempting to remove user')
         else:
-            # User doesn't exist
-            return 'User not found', False
+            raise web.HTTPNotFound(text='User not found')

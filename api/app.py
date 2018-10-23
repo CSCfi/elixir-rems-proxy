@@ -18,7 +18,7 @@ routes = web.RouteTableDef()
 async def api_get(request):
     """Return name of service, doubles as a health check function."""
     LOG.debug('INDEX Request received.')
-    return web.json_response('ELIXIR AAI API for REMS')
+    return web.Response(text='ELIXIR AAI API for REMS')
 
 
 @routes.post('/user')
@@ -29,15 +29,12 @@ async def user_post(request):
     LOG.debug('POST Request received.')
     db_pool = request.app['pool']
 
-    exception, processed_request = await process_post_request(request, db_pool)
+    missing_datasets = await process_post_request(request, db_pool)
 
-    if processed_request:
-        if not exception:
-            return web.HTTPOk(text='Successful operation')
-        else:
-            return web.HTTPCreated(text=f'Following datasets are missing from REMS ({exception}), check "GET /user" endpoint for added permissions')
+    if len(missing_datasets) == 0:
+        return web.HTTPOk(text='Successful operation')
     else:
-        return web.HTTPConflict(text=exception)
+        return web.HTTPCreated(text=f'Following datasets are missing from REMS ({missing_datasets}), check "GET /user" endpoint for added permissions')
 
 
 @routes.get('/user/')
@@ -59,15 +56,14 @@ async def user_get(request):
 
     if 'user' in request.match_info:
         user_identifier = request.match_info['user']
-        exception, processed_request = await process_get_request(user_identifier, db_pool)
+        processed_request = await process_get_request(user_identifier, db_pool)
         if processed_request:
             return web.json_response(processed_request)
-        else:
-            return web.HTTPNotFound(text=exception)
     else:
-        return web.HTTPBadRequest(text='Invalid username supplied')
+        raise web.HTTPBadRequest(text='Username not provided')
 
 
+@routes.patch('/user/')
 @routes.patch('/user/{user}')
 async def user_patch(request):
     """PATCH request to the /user endpoint.
@@ -78,18 +74,16 @@ async def user_patch(request):
 
     if 'user' in request.match_info:
         user_identifier = request.match_info['user']
-        exception, processed_request = await process_patch_request(user_identifier, request, db_pool)
-        if processed_request:
-            if not exception:
-                return web.HTTPOk(text='Successful operation')
-            else:
-                return web.HTTPCreated(text=f'Following datasets are missing from REMS ({exception}), check "GET /user" endpoint for permissions')
+        processed_request = await process_patch_request(user_identifier, request, db_pool)
+        if len(processed_request) == 0 or processed_request is True:
+            return web.HTTPOk(text='Successful operation')
         else:
-            return web.HTTPNotFound(text='User not found')
+            return web.HTTPCreated(text=f'Following datasets are missing from REMS ({processed_request}), check "GET /user" endpoint for permissions')
     else:
-        return web.HTTPBadRequest(text='Invalid username supplied')
+        raise web.HTTPBadRequest(text='Username not provided')
 
 
+@routes.delete('/user/')
 @routes.delete('/user/{user}')
 async def user_delete(request):
     """DELETE request to the /user endpoint.
@@ -101,16 +95,11 @@ async def user_delete(request):
 
     if 'user' in request.match_info:
         user_identifier = request.match_info['user']
-        exception, processed_request = await process_delete_request(user_identifier, db_pool)
+        processed_request = await process_delete_request(user_identifier, db_pool)
         if processed_request:
-            if not exception:
-                return web.HTTPOk(text='User was deleted')
-            else:
-                return web.HTTPInternalServerError(text=exception)
-        else:
-            return web.HTTPNotFound(text='User not found')
+            return web.HTTPOk(text='User was deleted')
     else:
-        return web.HTTPBadRequest(text='Invalid username supplied')
+        raise web.HTTPBadRequest(text='Username not provided')
 
 
 async def init_db(app):

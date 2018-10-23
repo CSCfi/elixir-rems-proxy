@@ -86,7 +86,7 @@ curl -X PATCH \
 #### DELETE /user/username
 `DELETE` method at `/user` endpoint is used to delete user along with dataset permissions.
 ```
-curl -X DELETE http://localhost:8080/user/teemu2
+curl -X DELETE http://localhost:8080/user/test_user
 ```
 
 ### Other Business

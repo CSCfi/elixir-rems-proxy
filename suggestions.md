@@ -73,7 +73,7 @@ Suggested response addition:
 
 | Code | Description |
 | --- | --- |
-| 400 | Invalid username / Missing mandatory parameter username |
+| 400 | Username not provided |
 
 ### PATCH /user/username
 #### Payload
@@ -131,7 +131,7 @@ Suggested responses:
 | --- | --- |
 | 200 | Successful operation |
 | 201 | Partially successful operation (something was done, something was not done, usually happens when user is attempting to add permissions to datasets which don't exist in REMS. Response body can return the missing datasets which were in the request, see [app.py return http response](/api/app.py#L86).) |
-| 400 | Invalid username / Missing mandatory parameter username |
+| 400 | Username not provided |
 | 404 | User not found |
 
 ### DELETE /user/username
