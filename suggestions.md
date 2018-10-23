@@ -58,7 +58,7 @@ Suggested responses:
 | Code | Description |
 | --- | --- |
 | 200 | Successful operation |
-| 201 | Partially successful operation (something was done, something was not done, usually happens when user is attempting to add permissions to datasets which don't exist in REMS. Response body can return the missing datasets which were in the request, see [app.py return http response](/api/app.py#L38).) |
+| 201 | Partially successful operation (something was done, something was not done, usually happens when user is attempting to add permissions to datasets which don't exist in REMS. Response body can return the missing datasets which were in the request, see [app.py return http response](/api/app.py#L37).) |
 | 409 | Username is taken |
 
 ### GET /user/username
@@ -130,7 +130,7 @@ Suggested responses:
 | Code | Description |
 | --- | --- |
 | 200 | Successful operation |
-| 201 | Partially successful operation (something was done, something was not done, usually happens when user is attempting to add permissions to datasets which don't exist in REMS. Response body can return the missing datasets which were in the request, see [app.py return http response](/api/app.py#L86).) |
+| 201 | Partially successful operation (something was done, something was not done, usually happens when user is attempting to add permissions to datasets which don't exist in REMS. Response body can return the missing datasets which were in the request, see [app.py return http response](/api/app.py#L81).) |
 | 400 | Username not provided |
 | 404 | User not found |
 
