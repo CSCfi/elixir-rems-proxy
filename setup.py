@@ -2,14 +2,13 @@ from setuptools import setup
 
 setup(
     name='elixir_rems_proxy',
-    version=1.0,
+    version='0.1.dev',
     description='ELIXIR API for REMS DB integration',
     long_description_content_type='text/markdown',
     project_urls={
         'Source': 'https://github.com/CSCfi/elixir-rems-proxy',
     },
     author='CSC - IT Center for Science',
-    author_email='teemu.kataja@csc.fi',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -19,7 +18,7 @@ setup(
     ],
     packages=['api', 'api/utils'],
     install_requires=['aiohttp', 'asyncpg'],
-    entry_points={  # Optional
+    entry_points={
         'console_scripts': [
             'elixir_api=api.app:main',
         ],
