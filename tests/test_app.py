@@ -1,11 +1,20 @@
 import unittest
 
 import asynctest
+import asyncpg
+
+# from unittest import mock
 
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
-from aiohttp import web
-from api.app import init_app, main
-from unittest import mock
+# from aiohttp import web
+# from api.app import init_app, main
+from api.app import init_app
+
+
+async def create_db_mock(app):
+    """Mock the db connection pool."""
+    app['pool'] = asynctest.mock.Mock(asyncpg.create_pool())
+    return app
 
 
 class TestFunctions(unittest.TestCase):
@@ -34,23 +43,28 @@ class TestFunctions(unittest.TestCase):
     #         await init_app(app)
     #         db_mock.close.assert_called()
 
-    @mock.patch('api.app.web')
-    def test_main(self, mock_webapp):
-        """Test if server will run."""
-        main()
-        mock_webapp.run_app.assert_called()
+    # @mock.patch('api.app.web')
+    # def test_main(self, mock_webapp):
+    #     """Test if server will run."""
+    #     main()
+    #     mock_webapp.run_app.assert_called()
 
-    def test_init_app(self):
-        """Test if init() creates a web app."""
-        server = init_app()
-        self.assertIs(type(server), web.Application)
+    # def test_init_app(self):
+    #     """Test if init() creates a web app."""
+    #     server = init_app()
+    #     self.assertIs(type(server), web.Application)
 
 
 class TestEndpoints(AioHTTPTestCase):
     """Test the endpoints."""
 
-    async def get_application(self):
-        """Get the server initialisation."""
+    # async def get_application(self):
+    #     """Get the server initialisation."""
+    #     return init_app()
+
+    @asynctest.mock.patch('api.app.init_db', side_effect=create_db_mock)
+    async def get_application(self, pool_mock):
+        """Retrieve web Application for test."""
         return init_app()
 
     # async def test_health(self):
