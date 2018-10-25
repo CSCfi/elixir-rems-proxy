@@ -13,12 +13,31 @@ lein run test-data
 In case of issues with setting up the REMS database, consult their [GitHub page](https://github.com/CSCfi/rems/).
 
 #### Run API
-Download repository, install modules, run app.
+You can choose to run the API from three different methods:
+
+##### 1. Run without installing
 ```
 git clone https://github.com/CSCfi/elixir-rems-proxy/
 cd elixir-rems-proxy
 pip install -r requirements.txt
 python3 -m api.app
+```
+
+##### 2. Install and run
+```
+git clone https://github.com/CSCfi/elixir-rems-proxy/
+cd elixir-rems-proxy
+pip install .
+elixir_api
+```
+
+##### 3. Build image with `s2i` and run in `docker`
+```
+s2i build git@github.com:CSCfi/elixir-rems-proxy.git \
+    centos/python-36-centos7 \
+    elixir_api
+
+docker run -p 8080:8080 elixir_api
 ```
 
 ### Using the API
