@@ -50,7 +50,8 @@ async def create_user(user, connection):
 async def get_dataset_index(ds, connection):
     """Check if given dataset exists.
 
-    Returns dataset resource id for later use."""
+    Returns dataset resource id for later use.
+    """
     LOG.debug(f'Check if dataset {ds} exists')
     try:
         query = f"""SELECT id FROM resource WHERE organization='{ds[0]}' AND resid='{ds[1]}';"""

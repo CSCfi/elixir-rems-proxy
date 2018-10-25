@@ -25,7 +25,8 @@ async def api_get(request):
 async def user_post(request):
     """POST request to the /user endpoint.
 
-    Create new user with access to given datasets."""
+    Create new user with access to given datasets.
+    """
     LOG.debug('POST Request received.')
     db_pool = request.app['pool']
 
@@ -42,7 +43,8 @@ async def user_post(request):
 async def user_get(request):
     """GET request to the /user endpoint.
 
-    List all datasets user has access to."""
+    List all datasets user has access to.
+    """
     LOG.debug('GET Request received.')
     user_identifier = None  # username in REMS
     db_pool = request.app['pool']
@@ -68,7 +70,8 @@ async def user_get(request):
 async def user_patch(request):
     """PATCH request to the /user endpoint.
 
-    Update dataset permissions for given user."""
+    Update dataset permissions for given user.
+    """
     LOG.debug('PATCH Request received.')
     db_pool = request.app['pool']
 
@@ -88,7 +91,8 @@ async def user_patch(request):
 async def user_delete(request):
     """DELETE request to the /user endpoint.
 
-    Delete user."""
+    Delete user.
+    """
     LOG.debug('DELETE Request received.')
     user_identifier = None  # username in REMS
     db_pool = request.app['pool']
