@@ -9,8 +9,6 @@ git:
   depth: false
   quiet: true
 
-services: docker
-
 stages:
   - name: unittests
     if: type IN (push, pull_request)
