@@ -1,7 +1,19 @@
 ## ELIXIR API for REMS
+
+[![Coverage Status](https://coveralls.io/repos/github/CSCfi/elixir-rems-proxy/badge.svg?branch=master)](https://coveralls.io/github/CSCfi/elixir-rems-proxy?branch=master)
+[![Build Status](https://travis-ci.org/CSCfi/elixir-rems-proxy.svg?branch=master)](https://travis-ci.org/CSCfi/elixir-rems-proxy)
+[![Documentation Status](https://readthedocs.org/projects/elixir-api-for-rems/badge/?version=latest)](https://elixir-api-for-rems.readthedocs.io/en/latest/?badge=latest)
+
 This API is built according to the [ELIXIR Permissions API Specification 1.2](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2), which provides ELIXIR AAI with a custom API that is directly connected to a given REMS database.
 
+### Documentation
+
+Documentation is available at [Read the Docs](https://elixir-api-for-rems.readthedocs.io/en/latest/index.html).
+
 ### Quickstart
+
+<details><summary>View Quickstart Instructions</summary>
+
 #### Prerequisites
 Set up a REMS database with test data.
 ```
@@ -107,6 +119,8 @@ curl -X PATCH \
 ```
 curl -X DELETE http://localhost:8080/user/test_user
 ```
+
+</details>
 
 ### Other Business
 The [Permissions API Specification](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2) contains some typos. A [suggestions](suggestions.md) document has been drafted to correct those issues. Expect changes to be made to the specification in the near future, along with changes to the API app.
