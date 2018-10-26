@@ -62,7 +62,7 @@ To run the web app:
 Deployment
 ------------------------
 
-User OpenShift s2i to build an image
+Use OpenShift s2i to build an image
 
 .. code-block:: console
 
