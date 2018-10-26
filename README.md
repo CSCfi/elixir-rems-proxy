@@ -6,7 +6,14 @@
 
 This API is built according to the [ELIXIR Permissions API Specification 1.2](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2), which provides ELIXIR AAI with a custom API that is directly connected to a given REMS database.
 
+### Documentation
+
+Documentation is available at [Read the Docs](https://elixir-api-for-rems.readthedocs.io/en/latest/index.html).
+
 ### Quickstart
+
+<details><summary>View Quickstart Instructions</summary>
+
 #### Prerequisites
 Set up a REMS database with test data.
 ```
@@ -112,6 +119,8 @@ curl -X PATCH \
 ```
 curl -X DELETE http://localhost:8080/user/test_user
 ```
+
+</details>
 
 ### Other Business
 The [Permissions API Specification](https://app.swaggerhub.com/apis-docs/ELIXIR-Finland/Permissions/1.2) contains some typos. A [suggestions](suggestions.md) document has been drafted to correct those issues. Expect changes to be made to the specification in the near future, along with changes to the API app.
