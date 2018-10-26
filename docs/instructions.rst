@@ -59,6 +59,23 @@ To run the web app:
 
     $ elixir_rems_proxy
 
+Deployment
+------------------------
+
+User OpenShift s2i to build an image
+
+.. code-block:: console
+
+    $ s2i build git@github.com:CSCfi/elixir-rems-proxy.git \
+        centos/python-36-centos7 \
+        elixir_rems_proxy
+
+Then run the built image in docker
+
+.. code-block:: console
+
+    docker run -p 8080:8080 elixir_rems_proxy
+
 .. _database-setup:
 
 (Optional) Database Setup
