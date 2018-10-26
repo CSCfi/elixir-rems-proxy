@@ -3,12 +3,12 @@ import unittest
 import asynctest
 import asyncpg
 
-# from unittest import mock
+# from aiohttp import web
+from unittest import mock
 
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
-# from aiohttp import web
-# from api.app import init_app, main
-from api.app import init_app
+
+from elixir_rems_proxy.app import init_app, main
 
 
 async def create_db_mock(app):
@@ -28,57 +28,90 @@ class TestFunctions(unittest.TestCase):
         """Clear test case."""
         pass
 
-    # REDO!!
-    # async def test_db_pool_init(self):
-    #     """Test opening of db pool."""
-    #     app = {}
-    #     with asynctest.mock.patch('api.app.init_db_pool') as db_mock:
-    #         await init_app(app)
-    #         db_mock.assert_called()
-
-    # async def test_db_pool_close(self):
-    #     """Test closing of db pool."""
-    #     app = {}
-    #     with asynctest.mock.patch('api.app.init_db_pool') as db_mock:
-    #         await init_app(app)
-    #         db_mock.close.assert_called()
-
-    # @mock.patch('api.app.web')
-    # def test_main(self, mock_webapp):
-    #     """Test if server will run."""
-    #     main()
-    #     mock_webapp.run_app.assert_called()
-
-    # def test_init_app(self):
-    #     """Test if init() creates a web app."""
+    # def test_init(self):
+    #     """Test init type."""
     #     server = init_app()
     #     self.assertIs(type(server), web.Application)
+
+    @mock.patch('elixir_rems_proxy.app.web')
+    def test_main(self, mock_webapp):
+        """Test if server will run."""
+        main()
+        mock_webapp.run_app.assert_called()
 
 
 class TestEndpoints(AioHTTPTestCase):
     """Test the endpoints."""
 
-    # async def get_application(self):
-    #     """Get the server initialisation."""
-    #     return init_app()
-
-    @asynctest.mock.patch('api.app.init_db', side_effect=create_db_mock)
+    @asynctest.mock.patch('elixir_rems_proxy.app.init_db', side_effect=create_db_mock)
     async def get_application(self, pool_mock):
         """Retrieve web Application for test."""
         return init_app()
 
-    # async def test_health(self):
-    #     """Test that the server is running."""
-    #     response = await self.client.request("GET", "/")
-    #     assert response.status == 200
-    #     assert response.text == 'ELIXIR AAI API for REMS'
-
     @unittest_run_loop
     async def test_info(self):
         """Test the info endpoint."""
-        with asynctest.mock.patch('api.app.api_get', side_effect={"smth": "value"}):
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
             resp = await self.client.request("GET", "/")
         assert 200 == resp.status
+
+    # Find out how to mock user to make the function pass
+    # @asynctest.mock.patch('elixir_rems_proxy.app.request')
+    # @unittest_run_loop
+    # async def test_get_200(self, request):
+    #     """Test the get endpoint."""
+    #     with asynctest.mock.patch('elixir_rems_proxy.app.api_get', side_effect={"smth": "value"}):
+    #         request.match_info['user'] = 'username'
+    #         resp = await self.client.request("GET", "/user/username")
+    #     assert 200 == resp.status
+
+    # Test POST ...
+
+    @unittest_run_loop
+    async def test_get_400(self):
+        """Test the get endpoint."""
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
+            resp = await self.client.request("GET", "/user/")
+        assert 400 == resp.status
+
+    @unittest_run_loop
+    async def test_get_405(self):
+        """Test the get endpoint."""
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
+            resp = await self.client.request("GET", "/user")
+        assert 405 == resp.status
+
+    # Test PATCH 200
+
+    @unittest_run_loop
+    async def test_patch_400(self):
+        """Test the get endpoint."""
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
+            resp = await self.client.request("PATCH", "/user/")
+        assert 400 == resp.status
+
+    @unittest_run_loop
+    async def test_patch_405(self):
+        """Test the get endpoint."""
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
+            resp = await self.client.request("PATCH", "/user")
+        assert 405 == resp.status
+
+    # Test DELETE 200
+
+    @unittest_run_loop
+    async def test_delete_400(self):
+        """Test the get endpoint."""
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get', side_effect={"smth": "value"}):
+            resp = await self.client.request("DELETE", "/user/")
+        assert 400 == resp.status
+
+    @unittest_run_loop
+    async def test_delete_405(self):
+        """Test the get endpoint."""
+        with asynctest.mock.patch('elixir_rems_proxy.app.api_get', side_effect={"smth": "value"}):
+            resp = await self.client.request("DELETE", "/user")
+        assert 405 == resp.status
 
 
 if __name__ == '__main__':
