@@ -14,10 +14,10 @@ Python Modules
 Utility Functions
 *****************
 
-.. automodule:: beacon_api.utils
+.. automodule:: elixir_rems_proxy.utils
 
 .. autosummary::
-   :toctree: beacon_api.utils
+   :toctree: elixir_rems_proxy.utils
 
     elixir_rems_proxy.utils.logging
     elixir_rems_proxy.utils.db_pool

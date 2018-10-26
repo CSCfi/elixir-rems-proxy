@@ -56,7 +56,7 @@ An example ``POST`` request and response to the ``user`` endpoint:
 
 Example Response:
 
-.. code-block:: javascript
+.. code-block:: text
 
   Successful operation
 
@@ -112,7 +112,7 @@ An example ``PATCH`` request and response to the ``user`` endpoint:
 
 Example Response:
 
-.. code-block:: javascript
+.. code-block:: text
 
   Successful operation
 
@@ -124,6 +124,6 @@ An example ``DELETE`` request and response to the ``user`` endpoint:
 
 Example Response:
 
-.. code-block:: javascript
+.. code-block:: text
 
   User was deleted
