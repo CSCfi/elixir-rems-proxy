@@ -86,10 +86,11 @@ def api_key():
                 try:
                     assert os.environ.get('PUBLIC_KEY', None) == elixir_api_key
                     LOG.debug('Provided api key is authorized')
-                    return await handler(request)
                 except Exception as e:
                     LOG.debug(f'ERROR: Bad api key: {e}')
                     raise web.HTTPUnauthorized(text='Unauthorized api key')
+            # Carry on with user request
+            return await handler(request)
         elif '/user' not in request.path:
             # At info '/' endpoint
             LOG.debug('No api key required at info endpoint')
@@ -98,3 +99,15 @@ def api_key():
             LOG.debug('ERROR: Missing elixir-api-key from headers')
             raise web.HTTPBadRequest(text="Missing mandatory headers: 'elixir-api-key'")
     return api_key_middleware
+
+
+# def user_exists():
+#     """Check if user exists."""
+#     LOG.debug('Check if user exists')
+
+#     @web.middleware
+#     async def user_exists_middleware(request, handler):
+#         LOG.debug('Start user check')
+
+#         assert isinstance(request, web.Request)
+#         if request.method
