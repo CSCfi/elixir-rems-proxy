@@ -9,23 +9,25 @@ Environment Setup
 The application requires some environmental arguments in order to run properly, these are illustrated in
 the table below.
 
-+-------------+-------------------------------+-------------------------------------+
-| ENV         | Default                       | Description                         |
-+-------------+-------------------------------+-------------------------------------+
-| `DB_HOST`   | `postgresql://localhost:5432` | The URL for the PostgreSQL server.  |
-+-------------+-------------------------------+-------------------------------------+
-| `DB_NAME`   | `rems`                        | Name of the database.               |
-+-------------+-------------------------------+-------------------------------------+
-| `DB_USER`   | `rems`                        | Database username.                  |
-+-------------+-------------------------------+-------------------------------------+
-| `DB_PASS`   | `rems`                        | Database password.                  |
-+-------------+-------------------------------+-------------------------------------+
-| `APP_HOST`  | `0.0.0.0`                     | Default Host for the Web Server.    |
-+-------------+-------------------------------+-------------------------------------+
-| `APP_PORT`  | `8080`                        | Default port for the Web Server.    |
-+-------------+-------------------------------+-------------------------------------+
-| `DEBUG`     | `True`                        | If set to `True`, logs all actions. |
-+-------------+-------------------------------+-------------------------------------+
++------------- +-------------------------------+-------------------------------------+
+| ENV          | Default                       | Description                         |
++------------- +-------------------------------+-------------------------------------+
+| `DB_HOST`    | `postgresql://localhost:5432` | The URL for the PostgreSQL server.  |
++------------- +-------------------------------+-------------------------------------+
+| `DB_NAME`    | `rems`                        | Name of the database.               |
++------------- +-------------------------------+-------------------------------------+
+| `DB_USER`    | `rems`                        | Database username.                  |
++------------- +-------------------------------+-------------------------------------+
+| `DB_PASS`    | `rems`                        | Database password.                  |
++------------- +-------------------------------+-------------------------------------+
+| `APP_HOST`   | `0.0.0.0`                     | Default Host for the Web Server.    |
++------------- +-------------------------------+-------------------------------------+
+| `APP_PORT`   | `8080`                        | Default port for the Web Server.    |
++------------- +-------------------------------+-------------------------------------+
+| `PUBLIC_KEY` | `None`                        | Mandatory api key.                  |
++------------- +-------------------------------+-------------------------------------+
+| `DEBUG`      | `True`                        | If set to `True`, logs all actions. |
++------------- +-------------------------------+-------------------------------------+
 
 Setting the necessary environment variables can be done  e.g. via the command line:
 
@@ -37,6 +39,7 @@ Setting the necessary environment variables can be done  e.g. via the command li
     $ export DB_PASS=rems
     $ export HOST=0.0.0.0
     $ export PORT=8080
+    $ export PUBLIC_KEY=secret_string
     $ export DEBUG=True
 
 .. _app-setup:
