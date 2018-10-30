@@ -5,11 +5,11 @@ import sys
 
 from aiohttp import web
 
+from .schemas import load_schema
+from .utils.validate import validate
 from .utils.db_pool import init_db_pool
 from .utils.process import process_post_request, process_get_request, process_patch_request, process_delete_request
 from .utils.logging import LOG
-# from .utils.validate import validate IMPLEMENT JSON SCHEMA VALIDATION
-
 
 routes = web.RouteTableDef()
 
@@ -22,6 +22,7 @@ async def api_get(request):
 
 
 @routes.post('/user')
+@validate(load_schema("post"))
 async def user_post(request):
     """POST request to the /user endpoint.
 
@@ -67,6 +68,7 @@ async def user_get(request):
 
 @routes.patch('/user/')
 @routes.patch('/user/{user}')
+@validate(load_schema("patch"))
 async def user_patch(request):
     """PATCH request to the /user endpoint.
 
