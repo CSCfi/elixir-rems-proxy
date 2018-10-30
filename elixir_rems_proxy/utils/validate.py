@@ -1,5 +1,7 @@
 """JSON Schema Validation."""
 
+import os
+
 from functools import wraps
 
 from aiohttp import web
@@ -60,3 +62,39 @@ def validate(schema):
             return await func(*args)
         return wrapped
     return wrapper
+
+
+def api_key():
+    """Check if API key is valid."""
+    LOG.debug('Validate API key')
+
+    @web.middleware
+    async def api_key_middleware(request, handler):
+        LOG.debug('Start api key check')
+
+        assert isinstance(request, web.Request)
+        if '/user' in request.path and 'elixir-api-key' in request.headers:
+            LOG.debug('In /user path')
+            try:
+                elixir_api_key = request.headers.get('elixir-api-key')
+                LOG.debug('API key received')
+            except Exception as e:  # KeyError
+                LOG.debug('ERROR: Something wrong with fetching api key from headers')
+                raise web.HTTPBadRequest(text=f'Error with api key header: {e}')
+
+            if elixir_api_key is not None:
+                try:
+                    assert os.environ.get('PUBLIC_KEY', None) == elixir_api_key
+                    LOG.debug('Provided api key is authorized')
+                    return await handler(request)
+                except Exception as e:
+                    LOG.debug(f'ERROR: Bad api key: {e}')
+                    raise web.HTTPUnauthorized(text='Unauthorized api key')
+        elif '/user' not in request.path:
+            # At info '/' endpoint
+            LOG.debug('No api key required at info endpoint')
+            return await handler(request)
+        else:
+            LOG.debug('ERROR: Missing elixir-api-key from headers')
+            raise web.HTTPBadRequest(text="Missing mandatory headers: 'elixir-api-key'")
+    return api_key_middleware

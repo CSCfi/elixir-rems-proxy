@@ -6,7 +6,7 @@ import sys
 from aiohttp import web
 
 from .schemas import load_schema
-from .utils.validate import validate
+from .utils.validate import validate, api_key
 from .utils.db_pool import init_db_pool
 from .utils.process import process_post_request, process_get_request, process_patch_request, process_delete_request
 from .utils.logging import LOG
@@ -17,7 +17,7 @@ routes = web.RouteTableDef()
 @routes.get('/', name='index')
 async def api_get(request):
     """Return name of service, doubles as a health check function."""
-    LOG.debug('INDEX Request received.')
+    LOG.debug('INFO Request received.')
     return web.Response(text='ELIXIR AAI API for REMS')
 
 
@@ -123,7 +123,7 @@ async def close_db(app):
 def init_app():
     """Initialise the app."""
     LOG.info('Initialise the server.')
-    app = web.Application()
+    app = web.Application(middlewares=[api_key()])
     app.router.add_routes(routes)
     app.on_startup.append(init_db)
     app.on_cleanup.append(close_db)

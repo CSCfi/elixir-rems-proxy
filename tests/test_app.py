@@ -11,6 +11,9 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from elixir_rems_proxy.app import init_app, main
 
 
+# TO DO : test middleware and take mandatory api key into account in 200's and 405's
+
+
 async def create_db_mock(app):
     """Mock the db connection pool."""
     app['pool'] = asynctest.mock.Mock(asyncpg.create_pool())
@@ -70,48 +73,71 @@ class TestEndpoints(AioHTTPTestCase):
     @unittest_run_loop
     async def test_get_400(self):
         """Test the get endpoint."""
-        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
-            resp = await self.client.request("GET", "/user/")
+        with asynctest.mock.patch('elixir_rems_proxy.app.user_get'):
+            resp = await self.client.request("GET", "/user/", headers={})
         assert 400 == resp.status
 
     @unittest_run_loop
-    async def test_get_405(self):
+    async def test_get_401(self):
         """Test the get endpoint."""
-        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
-            resp = await self.client.request("GET", "/user")
-        assert 405 == resp.status
+        with asynctest.mock.patch('elixir_rems_proxy.app.user_get'):
+            resp = await self.client.request("GET", "/user/", headers={"elixir-api-key": "invalid_key"})
+        assert 401 == resp.status
+
+    # 405's disabled: write tests that takes mandatory api key into account
+
+    # @unittest_run_loop
+    # async def test_get_405(self):
+    #     """Test the get endpoint."""
+    #     with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
+    #         resp = await self.client.request("GET", "/user")
+    #     assert 405 == resp.status
 
     # Test PATCH 200
 
     @unittest_run_loop
     async def test_patch_400(self):
         """Test the get endpoint."""
-        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
-            resp = await self.client.request("PATCH", "/user/")
+        with asynctest.mock.patch('elixir_rems_proxy.app.user_patch'):
+            resp = await self.client.request("PATCH", "/user/", headers={})
         assert 400 == resp.status
 
     @unittest_run_loop
-    async def test_patch_405(self):
+    async def test_patch_401(self):
         """Test the get endpoint."""
-        with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
-            resp = await self.client.request("PATCH", "/user")
-        assert 405 == resp.status
+        with asynctest.mock.patch('elixir_rems_proxy.app.user_patch'):
+            resp = await self.client.request("PATCH", "/user/", headers={"elixir-api-key": "invalid_key"})
+        assert 401 == resp.status
+
+    # @unittest_run_loop
+    # async def test_patch_405(self):
+    #     """Test the get endpoint."""
+    #     with asynctest.mock.patch('elixir_rems_proxy.app.api_get'):
+    #         resp = await self.client.request("PATCH", "/user")
+    #     assert 405 == resp.status
 
     # Test DELETE 200
 
     @unittest_run_loop
     async def test_delete_400(self):
         """Test the get endpoint."""
-        with asynctest.mock.patch('elixir_rems_proxy.app.api_get', side_effect={"smth": "value"}):
-            resp = await self.client.request("DELETE", "/user/")
+        with asynctest.mock.patch('elixir_rems_proxy.app.user_delete', side_effect={"smth": "value"}):
+            resp = await self.client.request("DELETE", "/user/", headers={})
         assert 400 == resp.status
 
     @unittest_run_loop
-    async def test_delete_405(self):
+    async def test_delete_401(self):
         """Test the get endpoint."""
-        with asynctest.mock.patch('elixir_rems_proxy.app.api_get', side_effect={"smth": "value"}):
-            resp = await self.client.request("DELETE", "/user")
-        assert 405 == resp.status
+        with asynctest.mock.patch('elixir_rems_proxy.app.user_delete', side_effect={"smth": "value"}):
+            resp = await self.client.request("DELETE", "/user/", headers={"elixir-api-key": "invalid_key"})
+        assert 401 == resp.status
+
+    # @unittest_run_loop
+    # async def test_delete_405(self):
+    #     """Test the get endpoint."""
+    #     with asynctest.mock.patch('elixir_rems_proxy.app.api_get', side_effect={"smth": "value"}):
+    #         resp = await self.client.request("DELETE", "/user")
+    #     assert 405 == resp.status
 
 
 if __name__ == '__main__':
