@@ -6,7 +6,7 @@ import sys
 from aiohttp import web
 
 from .schemas import load_schema
-from .utils.validate import validate, api_key
+from .utils.validate import validate, api_key, check_user
 from .utils.db_pool import init_db_pool
 from .utils.process import process_post_request, process_get_request, process_patch_request, process_delete_request
 from .utils.logging import LOG
@@ -101,9 +101,8 @@ async def user_delete(request):
 
     if 'user' in request.match_info:
         user_identifier = request.match_info['user']
-        processed_request = await process_delete_request(user_identifier, db_pool)
-        if processed_request:
-            return web.HTTPOk(text='User was deleted')
+        await process_delete_request(user_identifier, db_pool)
+        return web.HTTPOk(text='User was deleted')
     else:
         raise web.HTTPBadRequest(text='Username not provided')
 
@@ -123,7 +122,7 @@ async def close_db(app):
 def init_app():
     """Initialise the app."""
     LOG.info('Initialise the server.')
-    app = web.Application(middlewares=[api_key()])
+    app = web.Application(middlewares=[api_key(), check_user()])
     app.router.add_routes(routes)
     app.on_startup.append(init_db)
     app.on_cleanup.append(close_db)

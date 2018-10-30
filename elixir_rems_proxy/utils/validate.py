@@ -9,6 +9,7 @@ from jsonschema import Draft7Validator, validators
 from jsonschema.exceptions import ValidationError
 
 from ..utils.logging import LOG
+from ..utils.db_actions import user_exists
 
 
 def extend_with_default(validator_class):
@@ -101,13 +102,55 @@ def api_key():
     return api_key_middleware
 
 
-# def user_exists():
-#     """Check if user exists."""
-#     LOG.debug('Check if user exists')
+async def parse_username(request):
+    """Parse username from request."""
+    if request.method == 'POST':
+        # Get user from payload
+        request_body = await request.json()
+        return request_body['user_identifier']
+    elif request.method in ['GET', 'PATCH', 'DELETE']:
+        # Get user from path
+        return request.match_info['user']
 
-#     @web.middleware
-#     async def user_exists_middleware(request, handler):
-#         LOG.debug('Start user check')
 
-#         assert isinstance(request, web.Request)
-#         if request.method
+def check_user():
+    """Check if user exists."""
+    LOG.debug('Check if user exists')
+
+    @web.middleware
+    async def check_user_middleware(request, handler):
+        LOG.debug(f'Start user check: {request}')
+        assert isinstance(request, web.Request)
+        username = None
+        LOG.debug(request.path)
+        if request.path.startswith('/user'):
+            username = await parse_username(request)
+        else:
+            LOG.debug('hello')
+            return await handler(request)
+        LOG.debug(username)
+        if username:
+            LOG.debug('Try to find user')
+            userid_exists = False
+
+            try:
+                # Take one connection from the active database connection pool
+                db_pool = request.app['pool']
+                async with db_pool.acquire() as connection:
+                    userid_exists = await user_exists(username, connection)
+            except Exception as e:
+                LOG.debug(f'ERROR: DB issue with finding user: {e}')
+                raise web.HTTPInternalServerError(text=f'Database error occurred while attempting to find user: {e}')
+            LOG.debug(userid_exists)
+            if request.method == 'POST' and userid_exists:
+                raise web.HTTPConflict(text='Username is taken')
+            elif (request.method == 'POST' and not userid_exists) or (request.method in ['GET', 'PATCH', 'DELETE'] and userid_exists):
+                # Handle request, do necessary operations
+                return await handler(request)
+            elif request.method in ['GET', 'PATCH', 'DELETE'] and not userid_exists:
+                raise web.HTTPNotFound(text='User not found')
+        else:
+            LOG.debug('ERROR: Username not provided')
+            raise web.HTTPBadRequest(text='Username not provided')
+
+    return check_user_middleware

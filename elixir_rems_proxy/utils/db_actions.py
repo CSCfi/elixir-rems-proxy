@@ -1,5 +1,7 @@
 """Database Queries."""
 
+from aiohttp import web
+
 from ..utils.logging import LOG
 
 
@@ -111,4 +113,4 @@ async def delete_user(user, connection):
         return True
     except Exception as e:
         LOG.debug(f'An error occurred while attempting to delete user -> {e}')
-        return None
+        raise web.HTTPInternalServerError(text='Database error when attempting to remove user')
