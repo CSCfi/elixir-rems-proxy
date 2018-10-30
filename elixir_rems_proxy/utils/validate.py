@@ -49,7 +49,7 @@ def validate(schema):
                 request_body = await request.json()
             except Exception:
                 LOG.debug('ERROR: Could not jsonify request body')
-                raise web.HTTPUnsupportedMediaType("Could not properly parse the provided Request Body as JSON.")
+                raise web.HTTPBadRequest(text='Could not properly parse Request Body as JSON')
             try:
                 LOG.debug('Validate against JSON schema')
                 DefaultValidatingDraft7Validator(schema).validate(request_body)
