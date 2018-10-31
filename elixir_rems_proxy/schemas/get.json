@@ -1,0 +1,42 @@
+{
+    "definitions": {},
+    "type": "object",
+    "required": [
+      "permissions"
+    ],
+    "properties": {
+      "permissions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "affiliation",
+            "source_signature",
+            "url_prefix",
+            "datasets"
+          ],
+          "properties": {
+            "affiliation": {
+              "type": "string",
+              "default": ""
+            },
+            "source_signature": {
+              "type": "string",
+              "default": ""
+            },
+            "url_prefix": {
+              "type": "string",
+              "default": ""
+            },
+            "datasets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "default": ""
+              }
+            }
+          }
+        }
+      }
+    }
+  }

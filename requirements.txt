@@ -1,2 +1,3 @@
 aiohttp
 asyncpg
+jsonschema==3.0.0a3

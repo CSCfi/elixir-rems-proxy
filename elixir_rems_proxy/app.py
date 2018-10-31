@@ -5,11 +5,11 @@ import sys
 
 from aiohttp import web
 
+from .schemas import load_schema
+from .utils.validate import validate, api_key, check_user
 from .utils.db_pool import init_db_pool
 from .utils.process import process_post_request, process_get_request, process_patch_request, process_delete_request
 from .utils.logging import LOG
-# from .utils.validate import validate IMPLEMENT JSON SCHEMA VALIDATION
-
 
 routes = web.RouteTableDef()
 
@@ -17,11 +17,12 @@ routes = web.RouteTableDef()
 @routes.get('/', name='index')
 async def api_get(request):
     """Return name of service, doubles as a health check function."""
-    LOG.debug('INDEX Request received.')
+    LOG.debug('INFO Request received.')
     return web.Response(text='ELIXIR AAI API for REMS')
 
 
 @routes.post('/user')
+@validate(load_schema("post"))
 async def user_post(request):
     """POST request to the /user endpoint.
 
@@ -67,6 +68,7 @@ async def user_get(request):
 
 @routes.patch('/user/')
 @routes.patch('/user/{user}')
+@validate(load_schema("patch"))
 async def user_patch(request):
     """PATCH request to the /user endpoint.
 
@@ -99,9 +101,8 @@ async def user_delete(request):
 
     if 'user' in request.match_info:
         user_identifier = request.match_info['user']
-        processed_request = await process_delete_request(user_identifier, db_pool)
-        if processed_request:
-            return web.HTTPOk(text='User was deleted')
+        await process_delete_request(user_identifier, db_pool)
+        return web.HTTPOk(text='User was deleted')
     else:
         raise web.HTTPBadRequest(text='Username not provided')
 
@@ -121,7 +122,7 @@ async def close_db(app):
 def init_app():
     """Initialise the app."""
     LOG.info('Initialise the server.')
-    app = web.Application()
+    app = web.Application(middlewares=[api_key(), check_user()])
     app.router.add_routes(routes)
     app.on_startup.append(init_db)
     app.on_cleanup.append(close_db)
