@@ -16,7 +16,8 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.6',
     ],
-    packages=['elixir_rems_proxy', 'elixir_rems_proxy/utils'],
+    packages=['elixir_rems_proxy', 'elixir_rems_proxy/utils', 'elixir_rems_proxy/schemas'],
+    package_data={'': ['*.json']},
     install_requires=['aiohttp', 'asyncpg'],
     entry_points={
         'console_scripts': [
