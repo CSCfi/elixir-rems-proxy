@@ -34,6 +34,7 @@ An example ``POST`` request and response to the ``user`` endpoint:
   $ curl -X POST \
     http://localhost:8080/user \
     -H 'Content-Type: application/json' \
+    -H 'elixir-api-key: secret' \
     -d '{
     "user_identifier": "test_user",
     "affiliation": "",
@@ -64,7 +65,7 @@ An example ``GET`` request and response to the ``user`` endpoint:
 
 .. code-block:: console
 
-  $ curl -X GET http://localhost:8080/user/test_user
+  $ curl -X GET -H 'elixir-api-key: secret' http://localhost:8080/user/test_user
 
 Example Response:
 
@@ -91,6 +92,7 @@ An example ``PATCH`` request and response to the ``user`` endpoint:
   $ curl -X PATCH \
     http://localhost:8080/user/test_user \
     -H 'Content-Type: application/json' \
+    -H 'elixir-api-key: secret' \
     -d '{
     "user_identifier": "",
     "affiliation": "",
@@ -120,7 +122,7 @@ An example ``DELETE`` request and response to the ``user`` endpoint:
 
 .. code-block:: console
 
-  $ curl -X DELETE http://localhost:8080/user/test_user
+  $ curl -X DELETE -H 'elixir-api-key: secret' http://localhost:8080/user/test_user
 
 Example Response:
 
