@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo 'Start ELIXIR API for REMS'
+echo 'Start ELIXIR Permissions API for REMS API'
 exec elixir_api

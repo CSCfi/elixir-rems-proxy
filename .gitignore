@@ -1,1 +1,3 @@
 .vscode/
+.tox/
+tests/__pycache__/
