@@ -50,13 +50,22 @@ async def create_response_body(permissions):
         # Missing keys, that are not yet available from REMS and are hardcoded
         # 1. source
         # 2. authoriser
+
+        # REMS doesn't have "end" date, for now, replace it with "start" + 3 years for an estimate
+        if permission.get('end') is None:
+            expires = await iso_to_timestamp(permission.get('start'))
+            expires += 94608000
+        else:
+            # Fallback, in case REMS is updated to use this key
+            expires = await iso_to_timestamp(permission.get('end'))
+
         permission_object = {
             'value': f'https://www.ebi.ac.uk/ega/{permission.get("resource")}',
             'source': 'https://ga4gh.org/duri/no_org',
             'by': 'dac',
             'authoriser': 'rems-demo@csc.fi',
             'asserted': await iso_to_timestamp(permission.get('start')),
-            'expires': await iso_to_timestamp(permission.get('end'))
+            'expires': expires
         }
         response_body['ga4gh']['ControlledAccessGrants'].append(permission_object)
 
