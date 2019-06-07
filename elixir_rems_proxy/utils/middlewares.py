@@ -1,7 +1,5 @@
 """Web Server Middleware Components."""
 
-import os
-
 from aiohttp import web
 
 from ..utils.logging import LOG

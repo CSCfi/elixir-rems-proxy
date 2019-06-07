@@ -30,7 +30,8 @@ async def get_permissions(request):
     """
     LOG.debug('GET Request received.')
 
-    permissions = await request_rems_permissions(request.match_info['username'])
+    permissions = await request_rems_permissions(username=request.match_info.get('username'),
+                                                 api_key=request.headers.get('Permissions-Api-Key'))
 
     return web.json_response(permissions)
 
