@@ -17,6 +17,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     packages=['elixir_rems_proxy', 'elixir_rems_proxy/utils'],
+    package_data={'': ['*.ini']},
     install_requires=['aiohttp'],
     entry_points={
         'console_scripts': [
