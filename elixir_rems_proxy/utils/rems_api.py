@@ -1,8 +1,7 @@
 """Process Requests."""
 
 import os
-import hashlib
-import json
+import time
 
 from datetime import datetime
 
@@ -10,46 +9,20 @@ import aiohttp
 import dateutil.parser
 
 from aiohttp import web
+from authlib.jose import jwt
 
 from ..utils.config import CONFIG
 from ..utils.logging import LOG
 
 
-async def calculate_signature(body):
-    """Calculate SHA256 checksum for ga4gh object body."""
-    LOG.debug('Calculate SHA256 checksum for ga4gh object body.')
+async def create_ga4gh_visa_v1(permissions):
+    """Construct a GA4GH Passport Visa type of response."""
+    LOG.debug('Construct a GA4GH Passport Visa type of response.')
 
-    # Dump python dict into string representation of JSON
-    body_json = json.dumps(body)
+    # Collect permissions here
+    visas = []
 
-    # Encode the JSON string to UTF-8 and calculate a SHA256 checksum for it
-    hash_object = hashlib.sha256(body_json.encode('utf-8'))
-    checksum = hash_object.hexdigest()
-
-    # Add checksum to payload
-    body.update({'ga4ghSignature': checksum})
-
-    return body
-
-
-async def create_response_body(permissions):
-    """Construct a dictionary for JSON response body."""
-    LOG.debug('Construct a dictionary for JSON response body.')
-
-    # Body base form
-    response_body = {
-        "ga4gh": {
-            "ControlledAccessGrants": [
-
-            ]
-        }
-    }
-
-    # Append body with permission objects
     for permission in permissions:
-        # Missing keys, that are not yet available from REMS and are hardcoded
-        # 1. source
-        # 2. authoriser
 
         # REMS doesn't have "end" date, for now, replace it with "start" + 3 years for an estimate
         if permission.get('end') is None:
@@ -59,17 +32,17 @@ async def create_response_body(permissions):
             # Fallback, in case REMS is updated to use this key
             expires = await iso_to_timestamp(permission.get('end'))
 
-        permission_object = {
+        visa = {
+            'type': 'ControlledAccessGrants',
             'value': f'https://www.ebi.ac.uk/ega/{permission.get("resource")}',
             'source': 'https://ga4gh.org/duri/no_org',
             'by': 'dac',
-            'authoriser': 'rems-demo@csc.fi',
             'asserted': await iso_to_timestamp(permission.get('start')),
             'expires': expires
         }
-        response_body['ga4gh']['ControlledAccessGrants'].append(permission_object)
+        visas.append(visa)
 
-    return response_body
+    return visas
 
 
 async def iso_to_timestamp(iso):
@@ -126,7 +99,55 @@ async def call_rems_api(url, headers):
                 raise web.HTTPInternalServerError(text='500 Internal Server Error')
 
 
-async def request_rems_permissions(username, api_key):
+async def generate_jwt_timestamps():
+    """Generate issue and expiry timestamps for JWT."""
+    LOG.debug('Generating timestamps for JWT.')
+
+    # Get an epoch base time in seconds (int)
+    base_time = str(time.time())
+    base_time = base_time.split('.')
+    # Issued at
+    iat = int(base_time[0])
+    # Expires at iat+1h
+    exp = iat + 3600
+
+    return iat, exp
+
+
+async def create_ga4gh_passports(request, username, visas):
+    """Create GA4GH Passports from GA4GH Visas."""
+    LOG.debug('Crafting JWTs.')
+
+    # Collect passports here
+    passports = []
+    header = {
+        'jku': f'{request.scheme}://{request.host}/jwks.json',
+        'kid': CONFIG.key_id,
+        'alg': 'RS256',
+        'typ': 'JWT'
+    }
+
+    for visa in visas:
+
+        iat, exp = await generate_jwt_timestamps()
+
+        # Prepare the payload for JWT encoding
+        payload = {
+            'iss': f'{request.scheme}://{request.host}/',
+            'sub': username,
+            'ga4gh_visa_v1': visa,
+            'iat': iat,
+            'exp': exp
+        }
+
+        # Encode permissions into a JWT
+        encoded_visa = jwt.encode(header, payload, CONFIG.private_key).decode('utf-8')
+        passports.append(encoded_visa)
+
+    return passports
+
+
+async def request_rems_permissions(request, username, api_key):
     """Fetch dataset permissions from REMS."""
     LOG.debug('Fetch dataset permissions from REMS.')
 
@@ -141,12 +162,12 @@ async def request_rems_permissions(username, api_key):
 
     # Check if permissions were retrieved
     if permissions:
-        # Create ga4gh.ControlledAccessGrants payload
-        ga4gh_body = await create_response_body(permissions)
-        # Calculate SHA256 checksum for contents of ga4gh object
-        response_body = await calculate_signature(ga4gh_body)
-        # Return permissions object with checksum
-        return response_body
+        # Parse REMS records into GA4GH passport visas
+        ga4gh_visas = await create_ga4gh_visa_v1(permissions)
+        # Craft JWT tokens "ga4gh passports" from each permission "visa"
+        ga4gh_passports = await create_ga4gh_passports(request, username, ga4gh_visas)
+        # Return JWTs
+        return ga4gh_passports
     else:
-        # Return empty object due to no permissions found
-        return {}
+        # Return empty list due to no permissions found
+        return []

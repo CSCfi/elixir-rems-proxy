@@ -7,6 +7,7 @@ from aiohttp import web
 
 from .utils.middlewares import api_key, username_in_path
 from .utils.rems_api import request_rems_permissions
+from .utils.openid import jwks_json
 from .utils.config import CONFIG
 from .utils.logging import LOG
 
@@ -30,10 +31,24 @@ async def get_permissions(request):
     """
     LOG.debug('GET Request received.')
 
-    permissions = await request_rems_permissions(username=request.match_info.get('username'),
+    permissions = await request_rems_permissions(request=request,
+                                                 username=request.match_info.get('username'),
                                                  api_key=request.headers.get('Permissions-Api-Key'))
 
-    return web.json_response(permissions)
+    # The new GA4GH RI format
+    ga4gh_passport = {
+        'ga4gh_passport_v1': permissions
+    }
+
+    return web.json_response(ga4gh_passport)
+
+
+@routes.get('/jwks.json')
+async def jwks(request):
+    """Return JWK set keys."""
+    LOG.info('Received request to GET /jwks.json.')
+    jwk_set = await jwks_json(request)
+    return web.json_response(jwk_set)
 
 
 def init_app():

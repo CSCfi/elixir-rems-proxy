@@ -18,7 +18,7 @@ setup(
     ],
     packages=['elixir_rems_proxy', 'elixir_rems_proxy/utils'],
     package_data={'': ['*.ini']},
-    install_requires=['aiohttp'],
+    install_requires=['aiohttp', 'authlib', 'cryptography'],
     entry_points={
         'console_scripts': [
             'elixir_api=elixir_rems_proxy.app:main',
