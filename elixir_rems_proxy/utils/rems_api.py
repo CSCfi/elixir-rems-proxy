@@ -4,6 +4,7 @@ import os
 import time
 
 from datetime import datetime
+from uuid import uuid4
 
 import aiohttp
 import dateutil.parser
@@ -137,7 +138,8 @@ async def create_ga4gh_passports(request, username, visas):
             'sub': username,
             'ga4gh_visa_v1': visa,
             'iat': iat,
-            'exp': exp
+            'exp': exp,
+            'jti': str(uuid4())
         }
 
         # Encode permissions into a JWT
