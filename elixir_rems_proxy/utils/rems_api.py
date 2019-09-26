@@ -119,10 +119,16 @@ async def create_ga4gh_passports(request, username, visas):
     """Create GA4GH Passports from GA4GH Visas."""
     LOG.debug('Crafting JWTs.')
 
+    # `jku` and `iss` used to be formed with:
+    # f'{request.scheme}://{request.host}/jwks.json'
+    # but in openshift containers the apps are http,
+    # even though the ingress router is https.
+    # Hard-coding these for a quick fix (proxy is temporary)
+
     # Collect passports here
     passports = []
     header = {
-        'jku': f'{request.scheme}://{request.host}/jwks.json',
+        'jku': f'https://{request.host}/jwks.json',
         'kid': CONFIG.key_id,
         'alg': 'RS256',
         'typ': 'JWT'
@@ -134,7 +140,7 @@ async def create_ga4gh_passports(request, username, visas):
 
         # Prepare the payload for JWT encoding
         payload = {
-            'iss': f'{request.scheme}://{request.host}/',
+            'iss': f'https://{request.host}/',
             'sub': username,
             'ga4gh_visa_v1': visa,
             'iat': iat,
