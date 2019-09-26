@@ -24,13 +24,14 @@ async def create_ga4gh_visa_v1(permissions):
 
     for permission in permissions:
 
-        # REMS doesn't have "end" date, for now, replace it with "start" + 3 years for an estimate
-        if permission.get('end') is None:
-            expires = await iso_to_timestamp(permission.get('start'))
-            expires += 94608000
-        else:
-            # Fallback, in case REMS is updated to use this key
-            expires = await iso_to_timestamp(permission.get('end'))
+        # expires was removed from new RI spec
+        # # REMS doesn't have "end" date, for now, replace it with "start" + 3 years for an estimate
+        # if permission.get('end') is None:
+        #     expires = await iso_to_timestamp(permission.get('start'))
+        #     expires += 94608000
+        # else:
+        #     # Fallback, in case REMS is updated to use this key
+        #     expires = await iso_to_timestamp(permission.get('end'))
 
         visa = {
             'type': 'ControlledAccessGrants',
@@ -38,7 +39,6 @@ async def create_ga4gh_visa_v1(permissions):
             'source': 'https://ga4gh.org/duri/no_org',
             'by': 'dac',
             'asserted': await iso_to_timestamp(permission.get('start')),
-            'expires': expires
         }
         visas.append(visa)
 
