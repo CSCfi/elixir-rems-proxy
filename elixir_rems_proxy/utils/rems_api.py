@@ -160,7 +160,7 @@ async def request_rems_permissions(request, username, api_key):
     LOG.debug('Fetch dataset permissions from REMS.')
 
     # Items needed for REMS API call
-    rems_api = os.environ.get('REMS_URL', CONFIG.rems_url)
+    rems_api = f'{os.environ.get("REMS_URL", CONFIG.rems_url)}?user={username}'
     headers = {'x-rems-api-key': api_key,
                'x-rems-user-id': username,
                'content-type': 'application/json'}
