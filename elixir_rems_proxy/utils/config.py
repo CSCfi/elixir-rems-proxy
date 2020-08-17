@@ -31,7 +31,8 @@ def parse_config_file(path):
         'rems_url': config.get('proxy', 'rems_url') or 'localhost:3000/api/entitlements',
         'private_key': jwk.dumps(pem, kty='RSA'),
         'public_key': jwk.dumps(public_key, kty='RSA'),
-        'key_id': str(uuid4()).split('-')[0]
+        'key_id': str(uuid4()).split('-')[0],
+        'repository': config.get('ga4gh', 'repository') or 'http://none.org/'
     }
     return namedtuple("Config", config_vars.keys())(*config_vars.values())
 

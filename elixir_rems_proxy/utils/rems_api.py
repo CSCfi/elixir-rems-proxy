@@ -36,7 +36,7 @@ async def create_ga4gh_visa_v1(permissions):
 
         visa = {
             'type': 'ControlledAccessGrants',
-            'value': f'https://www.ebi.ac.uk/ega/{permission.get("resource")}',
+            'value': f'{CONFIG.repository}{permission.get("resource")}',
             'source': 'https://ga4gh.org/duri/no_org',
             'by': 'dac',
             'asserted': await iso_to_timestamp(permission.get('start')),
