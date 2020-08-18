@@ -1,39 +1,39 @@
 """Application Configuration."""
 
 import os
+import sys
+import json
 
 from pathlib import Path
-from uuid import uuid4
 from configparser import ConfigParser
 from collections import namedtuple
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
-from authlib.jose import jwk
+from ..utils.logging import LOG
+
+
+def load_json_file(path):
+    """Load local JSON file."""
+    LOG.info(f'Loading JSON file {path}')
+    json_file = Path(path)
+    if not json_file.is_file():
+        sys.exit(f'Could not find file {path}')
+    return json.loads(json_file.read_text())
 
 
 def parse_config_file(path):
     """Parse configuration file."""
-    # Generate JWKs for signing token
-    private_key = rsa.generate_private_key(public_exponent=65537,
-                                           key_size=2048,
-                                           backend=default_backend())
-    public_key = private_key.public_key().public_bytes(encoding=serialization.Encoding.PEM,
-                                                       format=serialization.PublicFormat.SubjectPublicKeyInfo)
-    pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
-                                    format=serialization.PrivateFormat.TraditionalOpenSSL,
-                                    encryption_algorithm=serialization.NoEncryption())
+    LOG.info(f'Parsing configuration file {path}')
+    public_key = load_json_file(os.environ.get('JWK_PUBLIC_KEY_FILE', Path(__file__).resolve().parent.joinpath('public_key.json')))
+    private_key = load_json_file(os.environ.get('JWK_PRIVATE_KEY_FILE', Path(__file__).resolve().parent.joinpath('private_key.json')))
     config = ConfigParser()
     config.read(path)
     config_vars = {
         'host': config.get('server', 'host') or '0.0.0.0',
         'port': config.get('server', 'port') or 8080,
-        'rems_url': config.get('proxy', 'rems_url') or 'localhost:3000/api/entitlements',
-        'private_key': jwk.dumps(pem, kty='RSA'),
-        'public_key': jwk.dumps(public_key, kty='RSA'),
-        'key_id': str(uuid4()).split('-')[0],
-        'repository': config.get('ga4gh', 'repository') or 'http://none.org/'
+        'rems_url': config.get('proxy', 'rems_url'),
+        'repository': config.get('ga4gh', 'repository'),
+        'public_key': public_key,
+        'private_key': private_key
     }
     return namedtuple("Config", config_vars.keys())(*config_vars.values())
 

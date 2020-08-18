@@ -7,7 +7,6 @@ from aiohttp import web
 
 from .utils.middlewares import api_key, username_in_path
 from .utils.rems_api import request_rems_permissions
-from .utils.openid import jwks_json
 from .utils.config import CONFIG
 from .utils.logging import LOG
 
@@ -45,8 +44,7 @@ async def get_permissions(request):
 async def jwks(request):
     """Return JWK set keys."""
     LOG.info('Received request to GET /jwks.json.')
-    jwk_set = await jwks_json(request)
-    return web.json_response(jwk_set)
+    return web.json_response(CONFIG.public_key)
 
 
 def init_app():

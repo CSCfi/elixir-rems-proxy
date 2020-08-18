@@ -5,3 +5,4 @@ elixir_rems_proxy/__pycache__/
 elixir_rems_proxy/utils/__pycache__/
 .coverage
 .python-version
+elixir_rems_proxy/utils/*.json
