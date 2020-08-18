@@ -75,7 +75,7 @@ async def call_rems_api(url, headers):
     LOG.debug('Send request for permissions.')
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers, ssl=False) as response:
+        async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 result = await response.json()
                 # REMS peculiarity: user not found == user found, but no permissions
