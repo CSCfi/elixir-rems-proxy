@@ -21,8 +21,6 @@ async def index(request):
     return web.Response(text='ELIXIR Permissions API proxy for REMS API')
 
 
-@routes.get('/permissions')
-@routes.get('/permissions/')
 @routes.get('/permissions/{username}')
 async def get_permissions(request):
     """GET request to the /permissions endpoint.
