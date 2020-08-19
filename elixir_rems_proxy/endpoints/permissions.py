@@ -1,6 +1,5 @@
 """Process Requests."""
 
-import os
 import time
 
 from datetime import datetime
@@ -12,8 +11,7 @@ import dateutil.parser
 from aiohttp import web
 from authlib.jose import jwt
 
-from ..utils.config import CONFIG
-from ..utils.logging import LOG
+from ..config import CONFIG, LOG
 
 
 async def create_ga4gh_visa_v1(permissions):
@@ -110,7 +108,7 @@ async def generate_jwt_timestamps():
     # Issued at
     iat = int(base_time[0])
     # Expires at iat+1h
-    exp = iat + 3600
+    exp = iat + CONFIG.jwt_exp
 
     return iat, exp
 
@@ -129,7 +127,7 @@ async def create_ga4gh_passports(request, username, visas):
     passports = []
     header = {
         'jku': f'https://{request.host}/jwks.json',
-        'kid': CONFIG.key_id,
+        'kid': CONFIG.public_key['keys'][0]['kid'],
         'alg': 'RS256',
         'typ': 'JWT'
     }
@@ -160,7 +158,7 @@ async def request_rems_permissions(request, username, api_key):
     LOG.debug('Fetch dataset permissions from REMS.')
 
     # Items needed for REMS API call
-    rems_api = f'{os.environ.get("REMS_URL", CONFIG.rems_url)}?user={username}'
+    rems_api = f'{CONFIG.rems_url}?user={username}'
     headers = {'x-rems-api-key': api_key,
                'x-rems-user-id': username,
                'content-type': 'application/json'}

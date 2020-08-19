@@ -2,7 +2,7 @@
 
 from aiohttp import web
 
-from ..utils.logging import LOG
+from ..config import LOG
 
 
 def api_key():

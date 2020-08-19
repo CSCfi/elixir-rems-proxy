@@ -1,15 +1,12 @@
 """ELIXIR Permissions API proxy for REMS API."""
 
-import os
 import sys
 
 from aiohttp import web
 
-from .utils.middlewares import api_key, username_in_path
-from .utils.rems_api import request_rems_permissions
-from .utils.openid import jwks_json
-from .utils.config import CONFIG
-from .utils.logging import LOG
+from .middlewares import api_key, username_in_path
+from .endpoints.permissions import request_rems_permissions
+from .config import CONFIG, LOG
 
 routes = web.RouteTableDef()
 
@@ -21,8 +18,6 @@ async def index(request):
     return web.Response(text='ELIXIR Permissions API proxy for REMS API')
 
 
-@routes.get('/permissions')
-@routes.get('/permissions/')
 @routes.get('/permissions/{username}')
 async def get_permissions(request):
     """GET request to the /permissions endpoint.
@@ -47,8 +42,7 @@ async def get_permissions(request):
 async def jwks(request):
     """Return JWK set keys."""
     LOG.info('Received request to GET /jwks.json.')
-    jwk_set = await jwks_json(request)
-    return web.json_response(jwk_set)
+    return web.json_response(CONFIG.public_key)
 
 
 def init_app():
@@ -63,8 +57,8 @@ def main():
     """Run the app."""
     LOG.info('Starting server build.')
     web.run_app(init_app(),
-                host=os.environ.get('APP_HOST', CONFIG.host),
-                port=int(os.environ.get('APP_PORT', CONFIG.port)),
+                host=CONFIG.host,
+                port=int(CONFIG.port),
                 shutdown_timeout=0)
 
 
