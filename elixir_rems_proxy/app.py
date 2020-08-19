@@ -5,10 +5,9 @@ import sys
 
 from aiohttp import web
 
-from .utils.middlewares import api_key, username_in_path
-from .utils.rems_api import request_rems_permissions
-from .utils.config import CONFIG
-from .utils.logging import LOG
+from .middlewares import api_key, username_in_path
+from .endpoints.permissions import request_rems_permissions
+from .config import CONFIG, LOG
 
 routes = web.RouteTableDef()
 

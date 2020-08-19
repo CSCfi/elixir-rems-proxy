@@ -23,7 +23,7 @@ def generate_jwks():
                                     encryption_algorithm=serialization.NoEncryption())
     key_id = str(uuid4()).split('-')[0]
     print('Writing keys to file.')
-    # Public data to jwks.json
+    # Public data to public_key.json
     public_data = {
         "keys": [
             jwk.dumps(public_key, kty='RSA'),
@@ -33,7 +33,7 @@ def generate_jwks():
     public_data['keys'][0].update({'alg': 'RS256'})
     with open(Path(__file__).resolve().parent.joinpath('public_key.json'), 'w') as public_file:
         public_file.write(json.dumps(public_data))
-    # Private data to key_id.key
+    # Private data to private_key.json
     with open(Path(__file__).resolve().parent.joinpath('private_key.json'), 'w') as private_file:
         private_file.write(json.dumps(jwk.dumps(pem, kty='RSA')))
     print('Done. Keys saved to public_key.json and private_key.json')

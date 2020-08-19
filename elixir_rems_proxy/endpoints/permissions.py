@@ -12,8 +12,7 @@ import dateutil.parser
 from aiohttp import web
 from authlib.jose import jwt
 
-from ..utils.config import CONFIG
-from ..utils.logging import LOG
+from ..config import CONFIG, LOG
 
 
 async def create_ga4gh_visa_v1(permissions):

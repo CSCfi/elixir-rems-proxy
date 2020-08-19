@@ -10,7 +10,7 @@ pip install -r requirements.txt
 ```
 Generate JWK set.
 ```
-python elixir_rems_proxy/utils/jwks.py
+python elixir_rems_proxy/config/jwks.py
 ```
 The `private_key.json` is used to sign the JWTs (keep this safe), and clients use the `public_key.json` from the `/jwks.json` endpoint to validate the JWTs.
 
