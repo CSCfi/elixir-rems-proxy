@@ -1,8 +1,8 @@
 """JWK Generator."""
 import json
+import secrets
 
 from pathlib import Path
-from uuid import uuid4
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
@@ -21,7 +21,6 @@ def generate_jwks():
     pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
                                     format=serialization.PrivateFormat.TraditionalOpenSSL,
                                     encryption_algorithm=serialization.NoEncryption())
-    key_id = str(uuid4()).split('-')[0]
     print('Writing keys to file.')
     # Public data to public_key.json
     public_data = {
@@ -29,7 +28,7 @@ def generate_jwks():
             jwk.dumps(public_key, kty='RSA'),
         ]
     }
-    public_data['keys'][0].update({'kid': key_id})
+    public_data['keys'][0].update({'kid': secrets.token_hex(4)})
     public_data['keys'][0].update({'alg': 'RS256'})
     with open(Path(__file__).resolve().parent.joinpath('public_key.json'), 'w') as public_file:
         public_file.write(json.dumps(public_data))
