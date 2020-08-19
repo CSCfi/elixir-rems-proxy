@@ -1,6 +1,5 @@
 """Process Requests."""
 
-import os
 import time
 
 from datetime import datetime
@@ -109,7 +108,7 @@ async def generate_jwt_timestamps():
     # Issued at
     iat = int(base_time[0])
     # Expires at iat+1h
-    exp = iat + 3600
+    exp = iat + CONFIG.jwt_exp
 
     return iat, exp
 
@@ -159,7 +158,7 @@ async def request_rems_permissions(request, username, api_key):
     LOG.debug('Fetch dataset permissions from REMS.')
 
     # Items needed for REMS API call
-    rems_api = f'{os.environ.get("REMS_URL", CONFIG.rems_url)}?user={username}'
+    rems_api = f'{CONFIG.rems_url}?user={username}'
     headers = {'x-rems-api-key': api_key,
                'x-rems-user-id': username,
                'content-type': 'application/json'}

@@ -38,6 +38,7 @@ def generate_jwks():
         private_file.write(json.dumps(jwk.dumps(pem, kty='RSA')))
     print('Done. Keys saved to public_key.json and private_key.json')
 
+
 if __name__ == '__main__':
     """Run script."""
     generate_jwks()

@@ -1,6 +1,5 @@
 """ELIXIR Permissions API proxy for REMS API."""
 
-import os
 import sys
 
 from aiohttp import web
@@ -58,8 +57,8 @@ def main():
     """Run the app."""
     LOG.info('Starting server build.')
     web.run_app(init_app(),
-                host=os.environ.get('APP_HOST', CONFIG.host),
-                port=int(os.environ.get('APP_PORT', CONFIG.port)),
+                host=CONFIG.host,
+                port=int(CONFIG.port),
                 shutdown_timeout=0)
 
 
