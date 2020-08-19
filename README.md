@@ -51,9 +51,9 @@ curl localhost:8080
 ELIXIR Permissions API proxy for REMS API
 ```
 #### GET /permissions/{username}
-Returns user's REMS permissions in GA4GH passport format (JWT). Permissions are returned as one token (GA4GH visa / JWT) per permission granted.
+Returns user's REMS permissions in GA4GH passport format (JWT). Permissions are returned as one token (GA4GH visa / JWT) per permission granted. `Permissions-Api-Key` is forwarded to REMS for validation.
 ```
-curl localhost:8080/permissions/user100
+curl -H 'Permissions-Api-Key: <api key here>' localhost:8080/permissions/user100
 ```
 ```
 {
