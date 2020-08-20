@@ -105,8 +105,7 @@ async def generate_jwt_timestamps() -> Tuple[int, int]:
     LOG.debug('Generating timestamps for JWT.')
 
     # Get an epoch base time in seconds (int)
-    base_time = str(time.time())
-    base_time = base_time.split('.')
+    base_time = str(time.time()).split('.')
     # Issued at
     iat = int(base_time[0])
     # Expires at iat+1h
