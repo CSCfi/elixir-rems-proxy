@@ -2,7 +2,7 @@
 
 import sys
 
-from aiohttp import web
+from aiohttp import web  # type: ignore
 
 from .middlewares import api_key, username_in_path
 from .endpoints.permissions import request_rems_permissions
@@ -12,14 +12,14 @@ routes = web.RouteTableDef()
 
 
 @routes.get('/', name='index')
-async def index(request):
+async def index(request: web.Request) -> web.Response:
     """Return name of service, doubles as a health check function."""
     LOG.debug('INFO Request received.')
     return web.Response(text='ELIXIR Permissions API proxy for REMS API')
 
 
 @routes.get('/permissions/{username}')
-async def get_permissions(request):
+async def get_permissions(request: web.Request) -> web.Response:
     """GET request to the /permissions endpoint.
 
     List all datasets user has access to.
@@ -39,13 +39,13 @@ async def get_permissions(request):
 
 
 @routes.get('/jwks.json')
-async def jwks(request):
+async def jwks(request: web.Request) -> web.Response:
     """Return JWK set keys."""
     LOG.info('Received request to GET /jwks.json.')
     return web.json_response(CONFIG.public_key)
 
 
-def init_app():
+def init_app() -> web.Application:
     """Initialise the app."""
     LOG.info('Initialising the server.')
     app = web.Application(middlewares=[api_key(), username_in_path()])

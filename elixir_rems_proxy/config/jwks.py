@@ -6,7 +6,7 @@ from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
-from authlib.jose import jwk
+from authlib.jose import jwk  # type: ignore
 
 
 def generate_jwks():
