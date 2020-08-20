@@ -38,7 +38,7 @@ python -m elixir_rems_proxy.app
 ```
 
 ### Production Server
-OpenShift integration is provided with [.s2i]().
+OpenShift integration is provided with [.s2i](.s2i/).
 
 A standalone image for other deployments (e.g. docker-compose or kubernetes) can be built with `docker`.
 ```
