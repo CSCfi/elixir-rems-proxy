@@ -1,6 +1,7 @@
 """Process Requests."""
 
 import time
+from typing import List, Optional, Tuple
 
 from datetime import datetime
 from uuid import uuid4
@@ -9,12 +10,13 @@ import aiohttp
 import dateutil.parser
 
 from aiohttp import web
-from authlib.jose import jwt
+from authlib.jose import jwt  # type: ignore
 
 from ..config import CONFIG, LOG
+from ..utils.types import Permission, Visa, Passport
 
 
-async def create_ga4gh_visa_v1(permissions):
+async def create_ga4gh_visa_v1(permissions: Permission) -> List[Visa]:
     """Construct a GA4GH Passport Visa type of response."""
     LOG.debug('Construct a GA4GH Passport Visa type of response.')
 
@@ -39,12 +41,12 @@ async def create_ga4gh_visa_v1(permissions):
             'by': 'dac',
             'asserted': await iso_to_timestamp(permission.get('start')),
         }
-        visas.append(visa)
+        visas.append(Visa(visa))
 
     return visas
 
 
-async def iso_to_timestamp(iso):
+async def iso_to_timestamp(iso: str) -> Optional[int]:
     """Convert ISO 8601 date to (int)timestamp without milliseconds.
 
     2020-01-01T12:00:00.000Z -> 1559893314
@@ -68,7 +70,7 @@ async def iso_to_timestamp(iso):
         return None
 
 
-async def call_rems_api(url, headers):
+async def call_rems_api(url: str, headers: dict) -> Optional[Permission]:
     """Send request for permissions."""
     LOG.debug('Send request for permissions.')
 
@@ -98,7 +100,7 @@ async def call_rems_api(url, headers):
                 raise web.HTTPInternalServerError(text='500 Internal Server Error')
 
 
-async def generate_jwt_timestamps():
+async def generate_jwt_timestamps() -> Tuple[int, int]:
     """Generate issue and expiry timestamps for JWT."""
     LOG.debug('Generating timestamps for JWT.')
 
@@ -113,7 +115,7 @@ async def generate_jwt_timestamps():
     return iat, exp
 
 
-async def create_ga4gh_passports(request, username, visas):
+async def create_ga4gh_passports(request: web.Request, username: str, visas: List[Visa]) -> List[Passport]:
     """Create GA4GH Passports from GA4GH Visas."""
     LOG.debug('Crafting JWTs.')
 
@@ -153,7 +155,7 @@ async def create_ga4gh_passports(request, username, visas):
     return passports
 
 
-async def request_rems_permissions(request, username, api_key):
+async def request_rems_permissions(request: web.Request, username: str, api_key: str) -> List[Passport]:
     """Fetch dataset permissions from REMS."""
     LOG.debug('Fetch dataset permissions from REMS.')
 
