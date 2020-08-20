@@ -1,5 +1,5 @@
 # ELIXIR Permissions API for REMS
-`elixir-rems-proxy` is a proxy web server, which implements the [ELIXIR Permissions API](), by forwarding requests to [REMS]() and returning the responses in [GA4GH Passport]() format.
+`elixir-rems-proxy` is a proxy web server, which implements the ELIXIR Permissions API, by forwarding requests to [REMS](https://github.com/cscfi/rems) and returning the responses in [GA4GH Passport](https://github.com/ga4gh-duri/ga4gh-duri.github.io/blob/master/researcher_ids/ga4gh_passport_v1.md) format.
 
 ## Set Up
 Download repository and install packages.
@@ -15,7 +15,7 @@ python elixir_rems_proxy/config/jwks.py
 The `private_key.json` is used to sign the JWTs (keep this safe), and clients use the `public_key.json` from the `/jwks.json` endpoint to validate the JWTs.
 
 ### Configuration
-Options available in [config.ini](elixir_rems_proxy/utils/config.ini) can be overwritten with the following environment variables.
+Options available in [config.ini](elixir_rems_proxy/config/config.ini) can be overwritten with the following environment variables.
 ```
 APP_HOST=0.0.0.0
 APP_PORT=8080
@@ -25,7 +25,7 @@ JWT_EXP=3600
 JWK_PUBLIC_KEY_FILE=/path/to/public_key.json
 JWK_PRIVATE_KEY_FILE=/path/to/private_key.json
 ```
-Environment variables outside of [config.ini](elixir_rems_proxy/utils/config.ini)
+Environment variables outside of [config.ini](elixir_rems_proxy/config/config.ini)
 ```
 DEBUG=True  # increases number of logging messages
 CONFIG_FILE=/path/to/config.ini
@@ -38,9 +38,15 @@ python -m elixir_rems_proxy.app
 ```
 
 ### Production Server
-TBD
+OpenShift integration is provided with [.s2i]().
 
-### Endpoints
+A standalone image for other deployments (e.g. docker-compose or kubernetes) can be built with `docker`.
+```
+docker build -t cscfi/elixir-rems-proxy .
+```
+JWKs can be included in the docker build above by first running `jwks.py` to create the key set, which will then be loaded into the image. Or they can be loaded from an external volume or configmap on runtime. Running the application requires the existence of the JWKs.
+
+## Endpoints
 
 #### GET /
 Returns name of service, can be used as a health-check endpoint.
