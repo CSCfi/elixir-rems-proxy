@@ -18,7 +18,7 @@ from ..utils.types import Permission, Visa, Passport
 
 async def create_ga4gh_visa_v1(permissions: Permission) -> List[Visa]:
     """Construct a GA4GH Passport Visa type of response."""
-    LOG.debug('Construct a GA4GH Passport Visa type of response.')
+    LOG.debug("Construct a GA4GH Passport Visa type of response.")
 
     # Collect permissions here
     visas = []
@@ -35,11 +35,11 @@ async def create_ga4gh_visa_v1(permissions: Permission) -> List[Visa]:
         #     expires = await iso_to_timestamp(permission.get('end'))
 
         visa = {
-            'type': 'ControlledAccessGrants',
-            'value': f'{CONFIG.repository}{permission.get("resource")}',
-            'source': 'https://ga4gh.org/duri/no_org',
-            'by': 'dac',
-            'asserted': await iso_to_timestamp(permission.get('start')),
+            "type": "ControlledAccessGrants",
+            "value": f'{CONFIG.repository}{permission.get("resource")}',
+            "source": "https://ga4gh.org/duri/no_org",
+            "by": "dac",
+            "asserted": await iso_to_timestamp(permission.get("start")),
         }
         visas.append(Visa(visa))
 
@@ -51,7 +51,7 @@ async def iso_to_timestamp(iso: str) -> Optional[int]:
 
     2020-01-01T12:00:00.000Z -> 1559893314
     """
-    LOG.debug('Convert date to timestamp.')
+    LOG.debug("Convert date to timestamp.")
 
     # Check that date is not null
     if isinstance(iso, str):
@@ -62,7 +62,7 @@ async def iso_to_timestamp(iso: str) -> Optional[int]:
         # Convert timestamp to string for splitting
         ts_str = str(ts)
         # Split timestamp to remove millis
-        ts_split = ts_str.split('.')
+        ts_split = ts_str.split(".")
         # Convert string to integer
         timestamp_final = int(ts_split[0])
         return timestamp_final
@@ -72,7 +72,7 @@ async def iso_to_timestamp(iso: str) -> Optional[int]:
 
 async def call_rems_api(url: str, headers: dict) -> Optional[Permission]:
     """Send request for permissions."""
-    LOG.debug('Send request for permissions.')
+    LOG.debug("Send request for permissions.")
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
@@ -84,28 +84,28 @@ async def call_rems_api(url: str, headers: dict) -> Optional[Permission]:
                 #                                 'Either the user has no permissions, or the username was not found.')
                 return result
             elif response.status == 400:
-                LOG.error(f'400: {response}')
-                raise web.HTTPBadRequest(text='400 Bad Request')
+                LOG.error(f"400: {response}")
+                raise web.HTTPBadRequest(text="400 Bad Request")
             elif response.status == 401:
-                LOG.error(f'401: {response}')
-                raise web.HTTPUnauthorized(text='401 Unauthorized')
+                LOG.error(f"401: {response}")
+                raise web.HTTPUnauthorized(text="401 Unauthorized")
             elif response.status == 403:
-                LOG.error(f'403: {response}')
-                raise web.HTTPForbidden(text='403 Forbidden')
+                LOG.error(f"403: {response}")
+                raise web.HTTPForbidden(text="403 Forbidden")
             elif response.status == 404:
-                LOG.error(f'404: {response}')
-                raise web.HTTPNotFound(text='404 Not Found')
+                LOG.error(f"404: {response}")
+                raise web.HTTPNotFound(text="404 Not Found")
             else:
-                LOG.error(f'500: {response}')
-                raise web.HTTPInternalServerError(text='500 Internal Server Error')
+                LOG.error(f"500: {response}")
+                raise web.HTTPInternalServerError(text="500 Internal Server Error")
 
 
 async def generate_jwt_timestamps() -> Tuple[int, int]:
     """Generate issue and expiry timestamps for JWT."""
-    LOG.debug('Generating timestamps for JWT.')
+    LOG.debug("Generating timestamps for JWT.")
 
     # Get an epoch base time in seconds (int)
-    base_time = str(time.time()).split('.')
+    base_time = str(time.time()).split(".")
     # Issued at
     iat = int(base_time[0])
     # Expires at iat+1h
@@ -116,7 +116,7 @@ async def generate_jwt_timestamps() -> Tuple[int, int]:
 
 async def create_ga4gh_passports(request: web.Request, username: str, visas: List[Visa]) -> List[Passport]:
     """Create GA4GH Passports from GA4GH Visas."""
-    LOG.debug('Crafting JWTs.')
+    LOG.debug("Crafting JWTs.")
 
     # `jku` and `iss` used to be formed with:
     # f'{request.scheme}://{request.host}/jwks.json'
@@ -127,10 +127,10 @@ async def create_ga4gh_passports(request: web.Request, username: str, visas: Lis
     # Collect passports here
     passports = []
     header = {
-        'jku': f'https://{request.host}/jwks.json',
-        'kid': CONFIG.public_key['keys'][0]['kid'],
-        'alg': 'RS256',
-        'typ': 'JWT'
+        "jku": f"https://{request.host}/jwks.json",
+        "kid": CONFIG.public_key["keys"][0]["kid"],
+        "alg": "RS256",
+        "typ": "JWT",
     }
 
     for visa in visas:
@@ -139,16 +139,16 @@ async def create_ga4gh_passports(request: web.Request, username: str, visas: Lis
 
         # Prepare the payload for JWT encoding
         payload = {
-            'iss': f'https://{request.host}/',
-            'sub': username,
-            'ga4gh_visa_v1': visa,
-            'iat': iat,
-            'exp': exp,
-            'jti': str(uuid4())
+            "iss": f"https://{request.host}/",
+            "sub": username,
+            "ga4gh_visa_v1": visa,
+            "iat": iat,
+            "exp": exp,
+            "jti": str(uuid4()),
         }
 
         # Encode permissions into a JWT
-        encoded_visa = jwt.encode(header, payload, CONFIG.private_key).decode('utf-8')
+        encoded_visa = jwt.encode(header, payload, CONFIG.private_key).decode("utf-8")
         passports.append(encoded_visa)
 
     return passports
@@ -156,13 +156,11 @@ async def create_ga4gh_passports(request: web.Request, username: str, visas: Lis
 
 async def request_rems_permissions(request: web.Request, username: str, api_key: str) -> List[Passport]:
     """Fetch dataset permissions from REMS."""
-    LOG.debug('Fetch dataset permissions from REMS.')
+    LOG.debug("Fetch dataset permissions from REMS.")
 
     # Items needed for REMS API call
-    rems_api = f'{CONFIG.rems_url}?user={username}'
-    headers = {'x-rems-api-key': api_key,
-               'x-rems-user-id': username,
-               'content-type': 'application/json'}
+    rems_api = f"{CONFIG.rems_url}?user={username}"
+    headers = {"x-rems-api-key": api_key, "x-rems-user-id": username, "content-type": "application/json"}
 
     # Call the REMS API, request for permissions
     permissions = await call_rems_api(url=rems_api, headers=headers)
