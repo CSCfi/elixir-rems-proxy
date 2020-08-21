@@ -14,12 +14,7 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.6",
     ],
-    packages=[
-        "elixir_rems_proxy",
-        "elixir_rems_proxy/config",
-        "elixir_rems_proxy/endpoints",
-        "elixir_rems_proxy/middlewares",
-    ],
+    packages=["elixir_rems_proxy", "elixir_rems_proxy/config", "elixir_rems_proxy/endpoints", "elixir_rems_proxy/middlewares",],
     package_data={"": ["*.ini", "*.json"]},
     install_requires=["aiohttp", "authlib", "cryptography"],
     entry_points={"console_scripts": ["elixir_rems_proxy=elixir_rems_proxy.app:main"]},
