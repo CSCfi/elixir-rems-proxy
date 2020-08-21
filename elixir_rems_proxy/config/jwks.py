@@ -14,13 +14,17 @@ def generate_jwks():
     # Generate keys
     print("Generating keys.")
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
-    public_key = private_key.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
+    public_key = private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
     pem = private_key.private_bytes(
-        encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.TraditionalOpenSSL, encryption_algorithm=serialization.NoEncryption(),
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
     )
     print("Writing keys to file.")
     # Public data to public_key.json
-    public_data = {"keys": [jwk.dumps(public_key, kty="RSA"),]}
+    public_data = {"keys": [jwk.dumps(public_key, kty="RSA")]}
     public_data["keys"][0].update({"kid": secrets.token_hex(4)})
     public_data["keys"][0].update({"alg": "RS256"})
     with open(Path(__file__).resolve().parent.joinpath("public_key.json"), "w") as public_file:
