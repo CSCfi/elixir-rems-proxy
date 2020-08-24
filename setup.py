@@ -17,5 +17,5 @@ setup(
     packages=["elixir_rems_proxy", "elixir_rems_proxy/config", "elixir_rems_proxy/endpoints", "elixir_rems_proxy/middlewares",],
     package_data={"": ["*.ini", "*.json"]},
     install_requires=["aiohttp", "authlib", "cryptography"],
-    entry_points={"console_scripts": ["elixir_rems_proxy=elixir_rems_proxy.app:main"]},
+    entry_points={"console_scripts": ["start_elixir_rems_proxy=elixir_rems_proxy.app:main"]},
 )
