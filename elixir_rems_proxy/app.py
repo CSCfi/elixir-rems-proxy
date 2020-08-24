@@ -51,7 +51,7 @@ def init_app() -> web.Application:
     return app
 
 
-def main():
+def main() -> None:
     """Run the app."""
     LOG.info("Starting server build.")
     web.run_app(init_app(), host=CONFIG.host, port=int(CONFIG.port), shutdown_timeout=0)

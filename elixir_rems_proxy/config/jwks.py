@@ -9,7 +9,7 @@ from cryptography.hazmat.backends import default_backend
 from authlib.jose import jwk
 
 
-def generate_jwks():
+def generate_jwks() -> None:
     """Generate JWK set."""
     # Generate keys
     print("Generating keys.")

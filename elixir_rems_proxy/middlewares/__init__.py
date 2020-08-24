@@ -1,16 +1,18 @@
 """Web Server Middleware Components."""
 
+from typing import Callable
+
 from aiohttp import web
 
 from ..config import LOG
 
 
-def api_key():
+def api_key() -> Callable:
     """Check that user has supplied an api key."""
     LOG.debug("Check that user has supplied an api key.")
 
     @web.middleware
-    async def api_key_middleware(request, handler):
+    async def api_key_middleware(request: web.Request, handler: Callable) -> Callable:
         if "/permissions" in request.path and "Permissions-Api-Key" in request.headers:
             LOG.debug("In /permissions path with api key.")
         elif "/permissions" not in request.path:
@@ -26,12 +28,12 @@ def api_key():
     return api_key_middleware
 
 
-def username_in_path():
+def username_in_path() -> Callable:
     """Check that request contains username."""
     LOG.debug("Check that request contains username.")
 
     @web.middleware
-    async def username_in_path_middleware(request, handler):
+    async def username_in_path_middleware(request: web.Request, handler: Callable) -> Callable:
         if request.path.startswith("/permissions"):
             LOG.debug("Request to permissions endpoint, username must be supplied.")
             if "username" not in request.match_info:
