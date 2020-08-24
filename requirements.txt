@@ -13,3 +13,4 @@ six==1.15.0
 typing-extensions==3.7.4.2
 yarl==1.5.1
 gunicorn==20.0.4
+mypy==0.782
