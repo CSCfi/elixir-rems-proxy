@@ -5,4 +5,4 @@ PORT=${APP_PORT:="8080"}
 WORKERS=${GUNICORN_WORKERS:="2"}
 
 echo 'Start ELIXIR Permissions API for REMS API'
-gunicorn elixir_rems_proxy.app:init_app --bind $HOST:$PORT --workers $WORKERS
+exec gunicorn elixir_rems_proxy.app:init_app --bind $HOST:$PORT --workers $WORKERS
