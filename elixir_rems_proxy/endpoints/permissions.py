@@ -10,7 +10,7 @@ import aiohttp
 import dateutil.parser
 
 from aiohttp import web
-from authlib.jose import jwt  # type: ignore
+from authlib.jose import jwt
 
 from ..config import CONFIG, LOG
 from ..utils.types import Permission, Visa, Passport

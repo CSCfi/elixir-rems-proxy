@@ -2,7 +2,7 @@
 
 import sys
 
-from aiohttp import web  # type: ignore
+from aiohttp import web
 
 from .middlewares import api_key, username_in_path
 from .endpoints.permissions import request_rems_permissions
