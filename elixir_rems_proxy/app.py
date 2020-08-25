@@ -43,7 +43,7 @@ async def jwks(request: web.Request) -> web.Response:
     return web.json_response(CONFIG.public_key)
 
 
-def init_app() -> web.Application:
+async def init_app() -> web.Application:
     """Initialise the app."""
     LOG.info("Initialising the server.")
     app = web.Application(middlewares=[api_key(), username_in_path()])
