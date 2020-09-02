@@ -16,7 +16,7 @@ from ..config import CONFIG, LOG
 from ..utils.types import Permission, Visa, Passport
 
 
-async def create_ga4gh_visa_v1(permissions: Permission) -> List[Visa]:
+async def create_ga4gh_visa_v1(permissions: List[Permission]) -> List[Visa]:
     """Construct a GA4GH Passport Visa type of response."""
     LOG.debug("Construct a GA4GH Passport Visa type of response.")
 
@@ -46,7 +46,7 @@ async def create_ga4gh_visa_v1(permissions: Permission) -> List[Visa]:
     return visas
 
 
-async def iso_to_timestamp(iso: str) -> Optional[int]:
+async def iso_to_timestamp(iso: Optional[str]) -> Optional[int]:
     """Convert ISO 8601 date to (int)timestamp without milliseconds.
 
     2020-01-01T12:00:00.000Z -> 1559893314
@@ -70,7 +70,7 @@ async def iso_to_timestamp(iso: str) -> Optional[int]:
         return None
 
 
-async def call_rems_api(url: str, headers: dict) -> Optional[Permission]:
+async def call_rems_api(url: str, headers: dict) -> List[Permission]:
     """Send request for permissions."""
     LOG.debug("Send request for permissions.")
 
