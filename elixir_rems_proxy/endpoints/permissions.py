@@ -49,7 +49,7 @@ async def create_ga4gh_visa_v1(permissions: List[Permission]) -> List[Visa]:
 async def iso_to_timestamp(iso: Optional[str]) -> Optional[int]:
     """Convert ISO 8601 date to (int)timestamp without milliseconds.
 
-    2020-01-01T12:00:00.000Z -> 1559893314
+    2020-01-01T12:00:00.000Z -> 1577880000
     """
     LOG.debug("Convert date to timestamp.")
 
