@@ -17,7 +17,6 @@ class TestJWKGenerationFunctions(TestCase):
         """Test that the files are written to."""
         print_jwks()
 
-        # TODO also check conf?
         public_key_path = os.environ.get("JWK_PUBLIC_KEY_FILE")
         private_key_path = os.environ.get("JWK_PRIVATE_KEY_FILE")
 

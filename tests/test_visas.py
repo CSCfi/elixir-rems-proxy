@@ -53,7 +53,7 @@ class TestPermissionFunctions(asynctest.TestCase):
     async def test_iso_to_timestamp(self):
         """Test that timestamp generation works as expected."""
         iso = "2020-01-01T12:00:00.000Z"
-        expected_stamp = 1577880000  # TODO not as in docstring (should it be?)
+        expected_stamp = 1577880000
         stamp = await permissions.iso_to_timestamp(iso)
         self.assertEqual(stamp, expected_stamp)
 
