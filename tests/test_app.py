@@ -30,9 +30,9 @@ class TestApp(AioHTTPTestCase):
         """Test that /permissions works if api key is provided."""
         resp = await self.client.request("GET", "/permissions/user", headers={"Permissions-Api-Key": "abc"})
         self.assertEqual(200, resp.status)
-        # check that a json dict is returned
+        # check that a json dict is returned, containing ga4gh passports
         content = await resp.json()
-        self.assertIsInstance(content, dict)
+        self.assertIn("ga4gh_passport_v1", content)
 
     @unittest_run_loop
     async def test_jwks(self):

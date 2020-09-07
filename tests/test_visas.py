@@ -106,13 +106,13 @@ class TestPermissionFunctions(asynctest.TestCase):
     @asynctest.patch("elixir_rems_proxy.endpoints.permissions.create_ga4gh_visa_v1")
     @asynctest.patch("elixir_rems_proxy.endpoints.permissions.create_ga4gh_passports")
     @asynctest.patch("elixir_rems_proxy.endpoints.permissions.call_rems_api")
-    async def test_request_permissions(self, mock_call_api, _mock_passport, _mock_visa):
+    async def test_request_permissions(self, mock_call_api, mock_passport, _mock_visa):
         """Test permission requests."""
 
-        mock_call_api.return_value = ["test"]
-        passports = await elixir_rems_proxy.endpoints.permissions.request_rems_permissions("", "", "")
-        self.assertNotEqual(passports, [])
-
-
-if __name__ == "__main__":
-    asynctest.main()
+        # If call_api returns a non-empt list, then request_rems_permission will return what ga4gh_passport
+        # returns
+        mock_call_api.return_value = ["testin"]
+        mock_passport.return_value = ["testout"]
+        passports = await permissions.request_rems_permissions("", "", "")
+        self.assertEqual(len(passports), 1)
+        self.assertEqual(passports, ["testout"])
