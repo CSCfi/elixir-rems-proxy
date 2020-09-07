@@ -28,12 +28,12 @@ jobs:
         pip install tox tox-gh-actions
     - name: Run unit tests for python 3.6
       if: ${{ matrix.python-version == '3.6' }}
-      run: tox -e py36
+      run: tox -e unit_test
     - name: Run unit tests for python 3.7
       if: ${{ matrix.python-version == '3.7' }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: tox -e py37
+      run: tox -e unit_test
     - name: Run unit tests for python 3.8
       if: ${{ matrix.python-version == '3.8' }}
-      run: tox -e py38
+      run: tox -e unit_test
