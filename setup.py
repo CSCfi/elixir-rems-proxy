@@ -23,6 +23,6 @@ setup(
     ],
     package_data={"": ["*.ini", "*.json"]},
     install_requires=["aiohttp", "authlib", "cryptography", "uvloop", "gunicorn"],
-    extras_require={"test": ["asynctest", "pytest", "pytest-cov"]},
+    extras_require={"test": ["asynctest", "pytest<5.4", "pytest-cov", "coverage==4.5.4", "coveralls", "testfixtures", "tox"]},
     entry_points={"console_scripts": ["start_elixir_rems_proxy=elixir_rems_proxy.app:main"]},
 )
