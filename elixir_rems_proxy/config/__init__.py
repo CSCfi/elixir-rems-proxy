@@ -36,8 +36,12 @@ def parse_config_file(path: Union[str, Path]) -> Config:
         rems_url=os.environ.get("REMS_URL", config.get("rems", "rems_url")),
         repository=os.environ.get("GA4GH_REPOSITORY", config.get("ga4gh", "repository")),
         jwt_exp=int(os.environ.get("JWT_EXP", config.get("ga4gh", "jwt_exp"))),
-        public_key=load_json_file(os.environ.get("JWK_PUBLIC_KEY_FILE", Path(__file__).resolve().parent.joinpath("public_key.json"))),
-        private_key=load_json_file(os.environ.get("JWK_PRIVATE_KEY_FILE", Path(__file__).resolve().parent.joinpath("private_key.json"))),
+        public_key=load_json_file(
+            os.environ.get("JWK_PUBLIC_KEY_FILE", config.get("jwk", "jwk_public_key_file")) or Path(__file__).resolve().parent.joinpath("public_key.json")
+        ),
+        private_key=load_json_file(
+            os.environ.get("JWK_PRIVATE_KEY_FILE", config.get("jwk", "jwk_private_key_file")) or Path(__file__).resolve().parent.joinpath("private_key.json")
+        ),
         host=os.environ.get("APP_HOST", config.get("server", "host")),
         port=os.environ.get("APP_PORT", config.get("server", "port")),
     )
