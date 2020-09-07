@@ -1,4 +1,9 @@
 # ELIXIR Permissions API for REMS
+
+![Python Unit Tests](https://github.com/CSCfi/elixir-rems-proxy/workflows/Python%20Unit%20Tests/badge.svg?branch=master)
+![Python style check](https://github.com/CSCfi/elixir-rems-proxy/workflows/Python%20style%20check/badge.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/CSCfi/elixir-rems-proxy/badge.svg)](https://coveralls.io/github/CSCfi/elixir-rems-proxy)
+
 `elixir-rems-proxy` is a proxy web server, which implements the ELIXIR Permissions API, by forwarding requests to [REMS](https://github.com/cscfi/rems) and returning the responses in [GA4GH Passport](https://github.com/ga4gh-duri/ga4gh-duri.github.io/blob/master/researcher_ids/ga4gh_passport_v1.md) format.
 
 ## Set Up
