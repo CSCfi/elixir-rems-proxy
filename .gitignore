@@ -6,3 +6,4 @@ elixir_rems_proxy/utils/__pycache__/
 .coverage
 .python-version
 elixir_rems_proxy/config/*.json
+tests/*.json
