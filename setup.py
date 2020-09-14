@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="elixir_rems_proxy",
-    version="1.0.0",
+    version="1.0.1",
     description="ELIXIR Permissions API proxy for REMS API",
     long_description_content_type="text/markdown",
     project_urls={"Source": "https://github.com/CSCfi/elixir-rems-proxy"},
