@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED 1
 
 # install module dependencies
 RUN apk update \
-    && apk add gcc musl-dev python3-dev libffi-dev openssl-dev
+    && apk add build-base gcc musl-dev python3-dev libffi-dev openssl-dev
 
 # lint
 RUN pip install --upgrade pip
