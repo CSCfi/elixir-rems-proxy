@@ -49,7 +49,11 @@ A standalone image for other deployments (e.g. docker-compose or kubernetes) can
 ```
 docker build -t cscfi/elixir-rems-proxy .
 ```
-JWKs can be included in the docker build above by first running `jwks.py` to create the key set, which will then be loaded into the image. Or they can be loaded from an external volume or configmap on runtime. Running the application requires the existence of the JWKs.
+The JWK set can be included in the container with several methods:
+1. Run `jwks.py` before build, and the keys will be included in the built image
+2. Load keys from an external volume `-v`, point to key files with ENV
+3. Load keys from a ConfigMap which is based on `config.ini`, point to config file with ENV
+4. Create keys in running container `docker exec <container> python elixir_rems_proxy/config/jwks.py`
 
 ## Endpoints
 
